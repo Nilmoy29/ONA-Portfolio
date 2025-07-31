@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Screen Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        .loading-screen-test {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .gif-container {
+            text-align: center;
+        }
+        .loading-gif {
+            width: 400px;
+            height: 400px;
+            object-fit: contain;
+            border: 2px solid #ccc;
+        }
+        .loading-text {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .loading-text h2 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+        .loading-text p {
+            margin: 0;
+            font-size: 0.875rem;
+            opacity: 0.9;
+            max-width: 24rem;
+        }
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 600px;
+        }
+        .button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .button:hover {
+            background: #555;
+        }
+        .gif-direct {
+            max-width: 300px;
+            max-height: 300px;
+            border: 2px solid #333;
+            margin: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen Test -->
+    <div id="loadingScreen" class="loading-screen-test">
+        <div class="gif-container">
+            <img src="/LOADINGSCREENANIMATION.gif" alt="Loading projects..." class="loading-gif">
+        </div>
+        <div class="loading-text">
+            <h2>Loading Projects</h2>
+            <p>Please wait while we fetch your portfolio...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content" class="test-container hidden">
+        <div class="content">
+            <h1>🧪 Loading Screen Debug Test</h1>
+            <p>This page tests if the loading screen GIF is working correctly.</p>
+            
+            <div>
+                <h3>Direct GIF Test:</h3>
+                <img src="/LOADINGSCREENANIMATION.gif" alt="Direct GIF test" class="gif-direct">
+                <p><strong>If you can see the GIF above, the file is accessible.</strong></p>
+            </div>
+
+            <div>
+                <h3>Test Actions:</h3>
+                <button class="button" onclick="showLoadingAgain()">Show Loading Screen Again</button>
+                <button class="button" onclick="testGifPath()">Test GIF Path</button>
+                <button class="button" onclick="checkFileExists()">Check File Exists</button>
+            </div>
+
+            <div id="testResults" style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+                <h4>Test Results:</h4>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show loading screen for 3 seconds initially
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            addResult('✅ Initial loading screen completed');
+        }, 3000);
+
+        function showLoadingAgain() {
+            document.getElementById('loadingScreen').classList.remove('hidden');
+            document.getElementById('content').classList.add('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+                addResult('✅ Loading screen test completed');
+            }, 2000);
+        }
+
+        function testGifPath() {
+            const img = new Image();
+            img.onload = function() {
+                addResult('✅ LOADINGSCREENANIMATION.gif loaded successfully');
+            };
+            img.onerror = function() {
+                addResult('❌ LOADINGSCREENANIMATION.gif failed to load');
+            };
+            img.src = '/LOADINGSCREENANIMATION.gif';
+        }
+
+        function checkFileExists() {
+            fetch('/LOADINGSCREENANIMATION.gif')
+                .then(response => {
+                    if (response.ok) {
+                        addResult('✅ LOADINGSCREENANIMATION.gif exists and is accessible');
+                    } else {
+                        addResult('❌ LOADINGSCREENANIMATION.gif returned status: ' + response.status);
+                    }
+                })
+                .catch(error => {
+                    addResult('❌ Error checking file: ' + error.message);
+                });
+        }
+
+        function addResult(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            div.style.marginBottom = '0.5rem';
+            results.appendChild(div);
+        }
+
+        // Auto-run tests when page loads
+        setTimeout(() => {
+            testGifPath();
+            checkFileExists();
+        }, 100);
+    </script>
+</body>
+</html> 

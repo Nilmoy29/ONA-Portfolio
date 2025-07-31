@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Supabase Login</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        const supabaseUrl = 'https://oscicdyjpnnykyqpvuys.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zY2ljZHlqcG5ueWt5cXB2dXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjE3OTcsImV4cCI6MjA2NzkzNzc5N30.IJrRjFZqKHejoM0GS6y0l50OXDmsoJRhVXINixJyB8E';
+        
+        const supabase = supabaseJS.createClient(supabaseUrl, supabaseAnonKey);
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'admin@ona.com',
+                    password: 'admin123456'
+                });
+                
+                if (error) {
+                    resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                } else {
+                    resultDiv.innerHTML = `✅ Success! User ID: ${data.user.id}`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `❌ Exception: ${err.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
