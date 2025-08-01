@@ -25,3 +25,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test files with hardcoded keys
+test-*.js
+test-*.html
+*-test.js
+comprehensive-crud-test.js
+final-verification-report.js
+fix-*.js
+disable-*.js
+simple-*.js
+debug-*.js
+reset-*.js
+setup-*.js
+create-*.js

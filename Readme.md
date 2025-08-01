@@ -168,7 +168,7 @@ Homepage – SOM
 * **Package Manager**: npm/yarn  
 * **Deployment**: Vercel (recommended for Next.js)  
 * **CDN**: Vercel Edge Network  
-* **Environment**: Node.js 18+
+* **Environment**: Node.js 20+
 
 ## **🏗️ System Architecture**
 
