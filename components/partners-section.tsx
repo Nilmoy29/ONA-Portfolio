@@ -60,7 +60,7 @@ export function PartnersSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-5xl lg:text-6xl font-light text-white mb-6">
-            Partners & <span className="text-[#ff6b00]">Allies</span>
+            Our <span className="text-[#ff6b00]">Allies</span>
           </h2>
           <p className="text-xl text-zinc-300 font-light max-w-2xl mx-auto">
             We collaborate with leading organizations that share our commitment to sustainable design and cultural

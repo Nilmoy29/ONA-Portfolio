@@ -1,26 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🧪 Simple test route called')
-    
+    // Test basic connection
+    const { data, error } = await supabase
+      .from('projects')
+      .select('id, title')
+      .eq('is_published', true)
+      .limit(3)
+
+    if (error) {
+      return NextResponse.json({ 
+        status: 'error',
+        error: error.message,
+        code: error.code
+      }, { status: 500 })
+    }
+
     return NextResponse.json({
       status: 'success',
-      message: 'Simple test working',
-      timestamp: new Date().toISOString(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV,
-        hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
-      }
+      message: 'Database connection working',
+      projects: data,
+      count: data?.length || 0
     })
+
   } catch (error: any) {
-    console.error('❌ Simple test error:', error)
-    
-    return NextResponse.json({
+    return NextResponse.json({ 
       status: 'error',
-      message: error.message,
-      stack: error.stack
+      error: error?.message || 'Unknown error'
     }, { status: 500 })
   }
 } 

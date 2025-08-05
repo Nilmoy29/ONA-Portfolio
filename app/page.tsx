@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LoadingScreen } from "@/components/loading-screen"
 import { Navigation } from "@/components/navigation"
 import { HeroSection } from "@/components/hero-section"
@@ -12,16 +12,55 @@ import { ContactSection } from "@/components/contact-section"
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
+  const [hasSeenLoading, setHasSeenLoading] = useState(false)
+
+  useEffect(() => {
+    // Check if user has already seen the loading screen in this session
+    try {
+      const seenLoading = localStorage.getItem('ona-loading-seen')
+      console.log('HomePage: localStorage check - seenLoading:', seenLoading)
+      
+      if (seenLoading) {
+        console.log('HomePage: User has seen loading screen before, skipping...')
+        setHasSeenLoading(true)
+        setIsLoading(false)
+      } else {
+        console.log('HomePage: First time visit, showing loading screen')
+        // Ensure loading stays true for first time visitors
+        setIsLoading(true)
+        setHasSeenLoading(false)
+      }
+    } catch (error) {
+      console.log('HomePage: localStorage not available, showing loading screen')
+      // If localStorage is not available, show loading screen
+      setIsLoading(true)
+      setHasSeenLoading(false)
+    }
+  }, [])
 
   const handleLoadingComplete = () => {
+    console.log('HomePage: Loading complete, hiding loading screen')
     setIsLoading(false)
+    
+    // Mark that the user has seen the loading screen
+    try {
+      localStorage.setItem('ona-loading-seen', 'true')
+      console.log('HomePage: Saved to localStorage')
+    } catch (error) {
+      console.log('HomePage: Could not save to localStorage')
+    }
+    
+    setHasSeenLoading(true)
   }
+
+  const shouldShowLoading = isLoading && !hasSeenLoading
+  console.log('HomePage: shouldShowLoading:', shouldShowLoading)
 
   return (
     <>
-      {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
+      {shouldShowLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
 
-      <div className={`transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
+      <div className={`transition-opacity duration-1000 ${shouldShowLoading ? "opacity-0" : "opacity-100"}`}>
         <Navigation />
         <HeroSection />
         <ServicesSection />

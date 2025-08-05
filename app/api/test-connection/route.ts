@@ -1,76 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Fallback configuration (same as logs route)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://oscicdyjpnnykyqpvuys.supabase.co'
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zY2ljZHlqcG5ueWt5cXB2dXlzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjM2MTc5NywiZXhwIjoyMDY3OTM3Nzk3fQ.RFGdVve9Gq9I19YKsDSBmKIFSEJDi0141l5JkbkFQgI'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = supabaseUrl && supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : null
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🧪 Testing Supabase connection...')
-    
-    // Environment check
-    const envCheck = {
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing (using fallback)',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing (using fallback)',
-      NODE_ENV: process.env.NODE_ENV || 'undefined'
+    if (!supabase) {
+      return NextResponse.json({ 
+        error: 'Missing Supabase configuration',
+        status: 'error'
+      }, { status: 503 })
     }
-    
-    console.log('📋 Environment variables:', envCheck)
-    
-    // Test basic connection
-    const { data: healthCheck, error: healthError } = await supabaseAdmin
+
+    // Simple test query
+    const { data, error } = await supabase
       .from('projects')
-      .select('count(*)')
+      .select('id, title')
+      .eq('is_published', true)
       .limit(1)
-    
-    if (healthError) {
-      console.error('❌ Health check failed:', healthError)
-      return NextResponse.json({
-        status: 'error',
-        error: 'Database connection failed',
-        details: healthError,
-        environment: envCheck
+
+    if (error) {
+      return NextResponse.json({ 
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        status: 'error'
       }, { status: 500 })
     }
-    
-    // Test projects table structure
-    const { data: projects, error: projectError } = await supabaseAdmin
-      .from('projects')
-      .select('id, title, slug')
-      .limit(3)
-    
-    if (projectError) {
-      console.error('❌ Projects query failed:', projectError)
-      return NextResponse.json({
-        status: 'warning',
-        message: 'Basic connection works but projects query failed',
-        error: projectError,
-        environment: envCheck
-      }, { status: 200 })
-    }
-    
-    console.log('✅ Connection test successful')
-    
+
     return NextResponse.json({
       status: 'success',
-      message: 'Supabase connection is working',
-      environment: envCheck,
-      projectCount: projects?.length || 0,
-      sampleProjects: projects?.map(p => ({ id: p.id, title: p.title })) || []
+      message: 'Database connection working',
+      data: data,
+      count: data?.length || 0
     })
-    
+
   } catch (error: any) {
-    console.error('❌ Connection test failed:', error)
-    
-    return NextResponse.json({
-      status: 'error',
-      error: 'Critical connection error',
-      message: error.message,
-      type: error.constructor.name,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    return NextResponse.json({ 
+      error: error?.message || 'Unknown error',
+      status: 'error'
     }, { status: 500 })
   }
 }

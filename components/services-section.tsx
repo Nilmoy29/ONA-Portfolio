@@ -33,9 +33,9 @@ const servicesData = [
     description: "Transform your vision into reality with comprehensive design solutions that honor cultural heritage while embracing contemporary innovation. From concept to completion, we create spaces that resonate with meaning.",
     icon: Home,
     features: [
-      { icon: Home, title: "Custom Architectural Solutions", description: "Tailored design approaches for unique projects" },
-      { icon: Compass, title: "Heritage-Focused Design", description: "Respecting cultural traditions in modern architecture" },
-      { icon: TreePine, title: "Eco-Friendly Practices", description: "Sustainable and environmentally conscious design" }
+      { icon: Home, title: "Custom Exterior Solution", description: "Tailored design approaches for unique projects" },
+      { icon: Compass, title: "Interior Solution", description: "Respecting cultural traditions in modern architecture" },
+      { icon: TreePine, title: "Landscape Design", description: "Sustainable and environmentally conscious design" }
     ],
     images: [
       "/interior-design.jpg",
@@ -44,13 +44,13 @@ const servicesData = [
   },
   {
     id: 2,
-    title: "Heritage Restoration",
-    description: "Breathe new life into historic structures with sensitive restoration and adaptive reuse projects. We bridge the gap between preserving cultural significance and meeting contemporary needs.",
+    title: "Engineering Consultancy",
+    description: "Delivering smart engineering solutions that respect the past while embracing the future. Our consultancy ensures structural integrity, modern systems integration, and precise calculations tailored to heritage and contemporary architecture alike.",
     icon: Mountain,
     features: [
-      { icon: Mountain, title: "Historic Preservation", description: "Expert restoration of culturally significant buildings" },
-      { icon: Settings, title: "Adaptive Reuse", description: "Modern functionality within historic frameworks" },
-      { icon: Brush, title: "Artisan Craftsmanship", description: "Traditional techniques with modern precision" }
+      { icon: Mountain, title: "Structural Solution", description: "Robust and context-sensitive structural designs." },
+      { icon: Settings, title: "Electrical Solution", description: "Seamless integration of modern electrical systems" },
+      { icon: Brush, title: "Flexibility Calculation", description: "Accurate modeling to ensure structural performance." }
     ],
     images: [
       "/Heritage.jpg",
@@ -64,7 +64,7 @@ const servicesData = [
     icon: Map,
     features: [
       { icon: Map, title: "Regional Planning", description: "Strategic development for sustainable communities" },
-      { icon: Trees, title: "Environmental Integration", description: "Landscape design that connects built and natural environments" },
+      { icon: Trees, title: "Adaptive Reuse", description: "Landscape design that connects built and natural environments" },
       { icon: Wind, title: "Climate Responsive", description: "Designs adapted to local environmental conditions" }
     ],
     images: [
