@@ -203,17 +203,34 @@ export function ContactSection() {
             >
               <p className="text-zinc-400 text-sm font-light uppercase tracking-wider">Follow Us</p>
               <div className="flex space-x-6">
-                {['LinkedIn', 'Instagram', 'Twitter', 'Facebook'].map((social) => (
-                  <motion.a
-                    key={social}
-                    href="#"
-                    className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {social}
-                  </motion.a>
-                ))}
+                <motion.a
+                  href="https://www.linkedin.com/company/ona-office-of-native-architects/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  LinkedIn
+                </motion.a>
+                <motion.a
+                  href="#"
+                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Instagram
+                </motion.a>
+                <motion.a
+                  href="https://www.facebook.com/people/ONA-I-Office-of-Native-Architects/61574622031136/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Facebook
+                </motion.a>
               </div>
             </motion.div>
           </motion.div>

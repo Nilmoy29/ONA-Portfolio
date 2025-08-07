@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ProjectsLoadingScreen } from '@/components/projects-loading-screen'
 import { 
   ArrowLeft, 
   MapPin, 
@@ -245,43 +246,16 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          {/* Modern loading animation with three dots */}
-          <div className="flex items-center justify-center space-x-1 mb-6">
-            {[0, 1, 2].map((index) => (
-              <motion.div
-                key={index}
-                className="w-3 h-3 bg-white rounded-full"
-                animate={{
-                  opacity: [0.3, 1, 0.3],
-                  scale: [0.8, 1, 0.8],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: index * 0.2,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Loading text with subtle fade animation */}
-          <motion.p 
-            className="text-zinc-400 text-lg font-light"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            Loading project...
-          </motion.p>
-        </motion.div>
-      </div>
+      <ProjectsLoadingScreen 
+        onComplete={() => {
+          // This will be called when loading is complete
+          // The actual loading state is managed by the component's loading state
+        }}
+        duration={2000}
+        title="Loading Project"
+        subtitle="Please wait while we fetch the project details..."
+        showText={true}
+      />
     )
   }
 
