@@ -76,6 +76,8 @@ export function ProjectForm({ project, isEdit = false }: ProjectFormProps) {
     project_type: project?.project_type || '',
     client_name: project?.client_name || '',
     location: project?.location || '',
+    architecture_consultant: (project as any)?.architecture_consultant || '',
+    engineering_consultant: (project as any)?.engineering_consultant || '',
     completion_date: (project as any)?.completion_date || '',
     project_status: project?.project_status || 'planning',
     is_published: project?.is_published || false,
@@ -215,6 +217,8 @@ export function ProjectForm({ project, isEdit = false }: ProjectFormProps) {
         project_type: formData.project_type.trim() || null,
         client_name: formData.client_name.trim() || null,
         location: formData.location.trim() || null,
+        architecture_consultant: formData.architecture_consultant.trim() || null,
+        engineering_consultant: formData.engineering_consultant.trim() || null,
         completion_date: formData.completion_date || null,
         project_status: formData.project_status || 'planning',
         is_published: Boolean(formData.is_published),
@@ -269,9 +273,28 @@ export function ProjectForm({ project, isEdit = false }: ProjectFormProps) {
       console.log('📥 Response ok:', response.ok)
 
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error('❌ Server error response:', errorData)
-        setError(errorData.error || `Server error: ${response.status}`)
+        let errorData = {}
+        let errorMessage = `Server error: ${response.status}`
+        
+        try {
+          // Try to parse the response as JSON
+          const responseText = await response.text()
+          console.log('📥 Raw response text:', responseText)
+          
+          if (responseText.trim()) {
+            errorData = JSON.parse(responseText)
+            console.error('❌ Server error response:', errorData)
+            errorMessage = errorData.error || errorData.message || `Server error: ${response.status}`
+          } else {
+            console.error('❌ Server returned empty response body')
+            errorMessage = `Server returned empty response (Status: ${response.status})`
+          }
+        } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError)
+          errorMessage = `Server error: ${response.status} - Invalid response format`
+        }
+        
+        setError(errorMessage)
         return
       }
 
@@ -406,6 +429,26 @@ export function ProjectForm({ project, isEdit = false }: ProjectFormProps) {
                   value={formData.client_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
                   placeholder="Client or organization name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="architecture_consultant">Architecture Consultant</Label>
+                <Input
+                  id="architecture_consultant"
+                  value={formData.architecture_consultant}
+                  onChange={(e) => setFormData(prev => ({ ...prev, architecture_consultant: e.target.value }))}
+                  placeholder="Name of the architecture consultant"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="engineering_consultant">Engineering Consultant</Label>
+                <Input
+                  id="engineering_consultant"
+                  value={formData.engineering_consultant}
+                  onChange={(e) => setFormData(prev => ({ ...prev, engineering_consultant: e.target.value }))}
+                  placeholder="Name of the engineering consultant"
                 />
               </div>
 

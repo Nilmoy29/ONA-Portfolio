@@ -18,6 +18,7 @@ import { Search, MapPin, Calendar, ArrowRight, Filter, ArrowLeft } from 'lucide-
 import { supabase } from '@/lib/supabase'
 import { ProjectsLoadingScreen } from '@/components/projects-loading-screen'
 import { ProjectsErrorBoundary } from '@/components/projects-error-boundary'
+import { Navigation } from '@/components/navigation'
 
 interface Project {
   id: string
@@ -280,20 +281,13 @@ export default function ProjectsPage() {
           />
         )}
         
-        <div className="min-h-screen bg-black text-white">
+        {/* Navigation Header */}
+        <Navigation />
+        
+        <div className="min-h-screen bg-black text-white pt-20">
           {/* Header */}
-          <div className="bg-zinc-900 border-b border-zinc-800">
+          <div className="bg-black border-b border-zinc-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-              {/* Back Button */}
-              <div className="mb-8">
-                <Button variant="outline" size="sm" asChild className="text-zinc-300 hover:text-white border-zinc-700 hover:border-[#ff6b00] hover:bg-[#ff6b00]/10">
-                  <Link href="/">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Home
-                  </Link>
-                </Button>
-              </div>
-              
               <div className="text-center">
                 <h1 className="text-4xl md:text-6xl font-light text-white mb-6">
                   Our <span className="text-[#ff6b00]">Projects</span>
@@ -379,7 +373,7 @@ export default function ProjectsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-zinc-800 aspect-[4/3] rounded-lg mb-4"></div>
+                  <div className="bg-zinc-800 aspect-[4/3] rounded-t-xl mb-4"></div>
                   <div className="h-4 bg-zinc-800 rounded mb-2"></div>
                   <div className="h-3 bg-zinc-800 rounded w-2/3"></div>
                 </div>
@@ -424,79 +418,65 @@ export default function ProjectsPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project) => (
-                <Card key={project.id} className="group hover:shadow-2xl transition-all duration-300 overflow-hidden bg-zinc-900 border-zinc-800 hover:border-[#ff6b00]/30">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    {project.featured_image_url ? (
-                      <Image
-                        src={project.featured_image_url}
-                        alt={project.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                        <div className="text-zinc-500 text-center">
-                          <div className="w-16 h-16 mx-auto mb-2 bg-zinc-700 rounded"></div>
-                          <p className="text-sm">No Image</p>
+                <Link key={project.id} href={`/projects/${project.slug}`} className="block group">
+                  <Card className="group hover:shadow-2xl transition-all duration-300 overflow-hidden bg-zinc-900 border-zinc-800 hover:border-[#ff6b00]/30 rounded-xl cursor-pointer">
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
+                      {project.featured_image_url ? (
+                        <Image
+                          src={project.featured_image_url}
+                          alt={project.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                          <div className="text-zinc-500 text-center">
+                            <div className="w-16 h-16 mx-auto mb-2 bg-zinc-700 rounded"></div>
+                            <p className="text-sm">No Image</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="absolute top-4 left-4">
+                        {project.categories && project.categories.length > 0 && (
+                          <Badge 
+                            className="bg-black/80 text-white hover:bg-black/90 border border-zinc-600"
+                            style={{
+                              backgroundColor: project.categories[0].color ? `${project.categories[0].color}20` : undefined,
+                              borderColor: project.categories[0].color || undefined
+                            }}
+                          >
+                            {project.categories[0].name}
+                          </Badge>
+                        )}
+                      </div>
+ 
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-medium text-white mb-2 group-hover:text-[#ff6b00] transition-colors">
+                        {project.title}
+                      </h3>
+                      {project.description && (
+                        <p className="text-zinc-300 text-sm mb-4 line-clamp-2">
+                          {project.description}
+                        </p>
+                      )}
+                      <div className="space-y-2 mb-4">
+                        {project.location && (
+                          <div className="flex items-center text-sm text-zinc-400">
+                            <MapPin className="w-4 h-4 mr-2" />
+                            <span>{project.location}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center text-sm text-zinc-400">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>{new Date(project.created_at).getFullYear()}</span>
                         </div>
                       </div>
-                    )}
-                    <div className="absolute top-4 left-4">
-                      {project.categories && project.categories.length > 0 && (
-                        <Badge 
-                          className="bg-black/80 text-white hover:bg-black/90 border border-zinc-600"
-                          style={{
-                            backgroundColor: project.categories[0].color ? `${project.categories[0].color}20` : undefined,
-                            borderColor: project.categories[0].color || undefined
-                          }}
-                        >
-                          {project.categories[0].name}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-[#ff6b00]/20 text-[#ff6b00] border border-[#ff6b00]/30">
-                        {formatStatus(project.project_status || null)}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-medium text-white mb-2 group-hover:text-[#ff6b00] transition-colors">
-                      {project.title}
-                    </h3>
-                    {project.description && (
-                      <p className="text-zinc-300 text-sm mb-4 line-clamp-2">
-                        {project.description}
-                      </p>
-                    )}
-                    <div className="space-y-2 mb-4">
-                      {project.client_name && (
-                        <div className="flex items-center text-sm text-zinc-400">
-                          <span className="font-medium mr-2 text-zinc-300">Client:</span>
-                          <span>{project.client_name}</span>
-                        </div>
-                      )}
-                      {project.location && (
-                        <div className="flex items-center text-sm text-zinc-400">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          <span>{project.location}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center text-sm text-zinc-400">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>{new Date(project.created_at).getFullYear()}</span>
-                      </div>
-                    </div>
-                    <Button variant="ghost" className="w-full group text-zinc-300 hover:text-[#ff6b00] hover:bg-[#ff6b00]/10" asChild>
-                      <Link href={`/projects/${project.slug}`}>
-                        View Project
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}

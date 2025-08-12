@@ -416,6 +416,8 @@ export interface Database {
           category_id: string | null
           client: string | null
           client_name: string | null
+          architecture_consultant: string | null
+          engineering_consultant: string | null
           completion_date: string | null
           content: string | null
           created_at: string | null
@@ -450,6 +452,8 @@ export interface Database {
           category_id?: string | null
           client?: string | null
           client_name?: string | null
+          architecture_consultant?: string | null
+          engineering_consultant?: string | null
           completion_date?: string | null
           content?: string | null
           created_at?: string | null
@@ -484,6 +488,8 @@ export interface Database {
           category_id?: string | null
           client?: string | null
           client_name?: string | null
+          architecture_consultant?: string | null
+          engineering_consultant?: string | null
           completion_date?: string | null
           content?: string | null
           created_at?: string | null
@@ -731,6 +737,8 @@ export interface Project {
   location?: string | null
   client?: string | null
   client_name?: string | null
+  architecture_consultant?: string | null
+  engineering_consultant?: string | null
   year?: number | null
   area?: string | null
   status?: string | null

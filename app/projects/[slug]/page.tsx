@@ -50,6 +50,8 @@ interface ProjectDetail {
   gallery_images: string[] | null
   client_name: string | null
   location: string | null
+  architecture_consultant?: string | null
+  engineering_consultant?: string | null
   project_status: string | null
   created_at: string
   sort_order?: number
@@ -721,6 +723,8 @@ export default function ProjectDetailPage() {
                       {[
                         { label: "Client", value: project.client_name, icon: User },
                         { label: "Location", value: project.location, icon: MapPin },
+                         { label: "Architecture Consultant", value: project.architecture_consultant, icon: Users },
+                         { label: "Engineering Consultant", value: project.engineering_consultant, icon: Users },
                         { label: "Status", value: formatStatus(project.project_status), icon: Building, isBadge: true },
                         { label: "Completed", value: new Date(project.created_at).getFullYear(), icon: Calendar },
                         { label: "Category", value: project.categories?.name, icon: Award, isBadge: true }

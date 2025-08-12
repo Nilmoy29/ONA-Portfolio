@@ -154,6 +154,7 @@ export async function PUT(
     const allowedFields = [
       'title', 'slug', 'description', 'content', 'category_id', 'featured_image_url', 
       'gallery_images', 'features', 'client_name', 'location', 'project_status', 
+      'architecture_consultant', 'engineering_consultant',
       'is_published', 'sort_order'
     ]
     

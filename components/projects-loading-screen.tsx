@@ -42,8 +42,8 @@ export function ProjectsLoadingScreen({
         <Image 
           src="/Project_loading.gif" 
           alt="Loading projects..." 
-          width={400}
-          height={400}
+          width={150}
+          height={150}
           className="object-contain"
           unoptimized
           priority

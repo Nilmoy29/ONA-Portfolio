@@ -17,7 +17,7 @@ export default function HomePage() {
   useEffect(() => {
     // Check if user has already seen the loading screen in this session
     try {
-      const seenLoading = localStorage.getItem('ona-loading-seen')
+      const seenLoading = sessionStorage.getItem('ona-loading-seen')
       console.log('HomePage: localStorage check - seenLoading:', seenLoading)
       
       if (seenLoading) {
@@ -42,12 +42,12 @@ export default function HomePage() {
     console.log('HomePage: Loading complete, hiding loading screen')
     setIsLoading(false)
     
-    // Mark that the user has seen the loading screen
+    // Mark that the user has seen the loading screen for this session
     try {
-      localStorage.setItem('ona-loading-seen', 'true')
-      console.log('HomePage: Saved to localStorage')
+      sessionStorage.setItem('ona-loading-seen', 'true')
+      console.log('HomePage: Saved to sessionStorage')
     } catch (error) {
-      console.log('HomePage: Could not save to localStorage')
+      console.log('HomePage: Could not save to sessionStorage')
     }
     
     setHasSeenLoading(true)

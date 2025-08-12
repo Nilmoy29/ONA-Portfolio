@@ -76,12 +76,52 @@ export default function ProjectsPage() {
       })
 
       const response = await fetch(`/api/admin/projects?${params}`)
-      const data = await response.json()
-
-      if (data.data) {
-        setProjects(data.data)
-        setTotalPages(data.pagination.totalPages)
+      if (response.ok) {
+        const data = await response.json()
+        if (data?.data) {
+          setProjects(data.data)
+          setTotalPages(data.pagination.totalPages)
+          return
+        }
       }
+
+      // Fallback to direct Supabase query if API fails
+      const limit = 10
+      const from = (page - 1) * limit
+      const to = from + limit - 1
+
+      let query = supabase
+        .from('projects')
+        .select(
+          `*,
+           categories (
+             id,
+             name,
+             color
+           )`,
+          { count: 'exact' }
+        )
+        .order('sort_order', { ascending: true })
+        .range(from, to)
+
+      if (search) {
+        query = query.or(
+          `title.ilike.%${search}%,description.ilike.%${search}%,client_name.ilike.%${search}%`
+        )
+      }
+      if (selectedCategory && selectedCategory !== 'all') {
+        query = query.eq('category_id', selectedCategory)
+      }
+      if (selectedStatus && selectedStatus !== 'all') {
+        query = query.eq('project_status', selectedStatus)
+      }
+
+      const { data: rows, count, error } = await query
+      if (error) {
+        console.error('Admin projects fallback query error:', error)
+      }
+      setProjects((rows as any) || [])
+      setTotalPages(Math.max(1, Math.ceil((count || 0) / limit)))
     } catch (error) {
       console.error('Error fetching projects:', error)
     } finally {

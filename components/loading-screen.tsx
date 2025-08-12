@@ -45,24 +45,25 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
     // Listen for changes
     window.addEventListener('resize', checkDeviceAndOrientation)
-    window.addEventListener('orientationchange', () => {
+    const orientationHandler = () => {
       // Add delay for orientation change to complete
       setTimeout(checkDeviceAndOrientation, 100)
-    })
+    }
+    window.addEventListener('orientationchange', orientationHandler)
 
     return () => {
       window.removeEventListener('resize', checkDeviceAndOrientation)
-      window.removeEventListener('orientationchange', checkDeviceAndOrientation)
+      window.removeEventListener('orientationchange', orientationHandler)
     }
   }, [mounted])
 
   useEffect(() => {
     // Start timer immediately - don't wait for mounted state
-    console.log('Starting loading timer for 4 seconds')
+    console.log('Starting loading timer for 3 seconds')
     const timer = setTimeout(() => {
-      console.log('Loading screen timer completed after 4 seconds')
+      console.log('Loading screen timer completed after 3 seconds')
       onComplete()
-    }, 4000) // 4 seconds total
+    }, 3000) // 3 seconds total
 
     return () => {
       console.log('Cleaning up loading timer')

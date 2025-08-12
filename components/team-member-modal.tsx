@@ -153,7 +153,7 @@ export function TeamMemberModal({ isOpen, onClose, slug }: TeamMemberModalProps)
                       </div>
                       
                       <p className="text-lg text-gray-300 font-light leading-relaxed">
-                        {member.long_bio || member.bio}
+                        {member.bio}
                       </p>
 
                       {/* Contact Info */}
@@ -268,7 +268,7 @@ export function TeamMemberModal({ isOpen, onClose, slug }: TeamMemberModalProps)
                     )}
                   </div>
 
-                  {/* Certifications */}
+                  {/* Achievements */}
                   {member.certifications && member.certifications.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -276,7 +276,7 @@ export function TeamMemberModal({ isOpen, onClose, slug }: TeamMemberModalProps)
                       transition={{ delay: 0.6 }}
                       className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700"
                     >
-                      <h3 className="text-xl font-light mb-4 text-white">Certifications</h3>
+                      <h3 className="text-xl font-light mb-4 text-white">Achievements</h3>
                       <div className="space-y-2">
                         {member.certifications.map((cert, index) => (
                           <motion.div
@@ -291,6 +291,19 @@ export function TeamMemberModal({ isOpen, onClose, slug }: TeamMemberModalProps)
                           </motion.div>
                         ))}
                       </div>
+                    </motion.div>
+                  )}
+
+                  {/* Biography (Detailed) */}
+                  {member.long_bio && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                      className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700"
+                    >
+                      <h3 className="text-xl font-light mb-4 text-white">Biography</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{member.long_bio}</p>
                     </motion.div>
                   )}
 

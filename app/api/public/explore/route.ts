@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database-types'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey)
+// Initialize client defensively so the route doesn't crash if env is missing
+const supabase = supabaseUrl && supabaseServiceKey
+  ? createClient<Database>(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    })
+  : null
 
 export async function GET(request: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable - missing configuration' },
+        { status: 503 }
+      )
+    }
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -16,7 +27,20 @@ export async function GET(request: NextRequest) {
     
     let query = supabase
       .from('explore_content')
-      .select(`*`, { count: 'exact' })
+      .select(
+        `
+          id,
+          title,
+          slug,
+          content_type,
+          excerpt,
+          description,
+          featured_image_url,
+          author,
+          created_at
+        `,
+        { count: 'exact' }
+      )
       .eq('is_published', true)
     
     if (content_type) {
