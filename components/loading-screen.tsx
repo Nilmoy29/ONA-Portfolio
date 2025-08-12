@@ -1,104 +1,69 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
 interface LoadingScreenProps {
   onComplete: () => void
 }
 
+function detectIsMobile(): boolean {
+  if (typeof window === "undefined") return false
+
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || ""
+  const uaIndicatesMobile = /Android|iPhone|iPad|iPod|Windows Phone|IEMobile|BlackBerry|webOS|Opera Mini|Mobile/i.test(userAgent)
+
+  const widthIndicatesMobile = window.innerWidth < 1024
+
+  return uaIndicatesMobile || widthIndicatesMobile
+}
+
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
-  const [isMobile, setIsMobile] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  // Choose after hydration to avoid SSR/client mismatch; keep stable for the whole 3s
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
+  const timerRef = useRef<number | null>(null)
+  const completedRef = useRef(false)
 
   useEffect(() => {
-    setMounted(true)
+    setIsMobile(detectIsMobile())
   }, [])
 
+  // Clear timer if unmounted
   useEffect(() => {
-    if (!mounted) return
-
-    // Simplified and more reliable mobile detection
-    const checkDeviceAndOrientation = () => {
-      const screenWidth = window.innerWidth
-      const screenHeight = window.innerHeight
-      const isPortrait = screenHeight > screenWidth
-      
-      // More liberal mobile detection - anything under 1024px width and in portrait
-      const isMobileDevice = screenWidth < 1024
-      const shouldShowPortrait = isMobileDevice && isPortrait
-      
-      console.log('Loading Screen Debug:', {
-        screenWidth,
-        screenHeight,
-        isPortrait,
-        isMobileDevice,
-        shouldShowPortrait,
-        currentGif: shouldShowPortrait ? 'portrait' : 'landscape'
-      })
-      
-      setIsMobile(shouldShowPortrait)
-    }
-
-    // Check immediately
-    checkDeviceAndOrientation()
-
-    // Listen for changes
-    window.addEventListener('resize', checkDeviceAndOrientation)
-    const orientationHandler = () => {
-      // Add delay for orientation change to complete
-      setTimeout(checkDeviceAndOrientation, 100)
-    }
-    window.addEventListener('orientationchange', orientationHandler)
-
     return () => {
-      window.removeEventListener('resize', checkDeviceAndOrientation)
-      window.removeEventListener('orientationchange', orientationHandler)
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
     }
-  }, [mounted])
+  }, [])
 
-  useEffect(() => {
-    // Start timer immediately - don't wait for mounted state
-    console.log('Starting loading timer for 3 seconds')
-    const timer = setTimeout(() => {
-      console.log('Loading screen timer completed after 3 seconds')
-      onComplete()
-    }, 3000) // 3 seconds total
-
-    return () => {
-      console.log('Cleaning up loading timer')
-      clearTimeout(timer)
-    }
-  }, [onComplete])
-
-  // Show loading screen even before mounted to prevent flash
-  if (!mounted) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black">
-        <Image 
-          src="/loading_animation.gif"
-          alt="Loading..." 
-          fill
-          className="object-cover"
-          unoptimized
-          priority
-        />
-      </div>
-    )
+  if (isMobile === null) {
+    return <div className="fixed inset-0 z-50 bg-black" />
   }
 
   const gifSrc = isMobile ? "/loading_animation_portrait.gif" : "/loading_animation.gif"
-  console.log('Rendering with GIF:', gifSrc)
+
+  const handleImageLoaded = () => {
+    if (completedRef.current) return
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = window.setTimeout(() => {
+      if (!completedRef.current) {
+        completedRef.current = true
+        onComplete()
+      }
+    }, 3000)
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      <Image 
+      <Image
         src={gifSrc}
-        alt="Loading..." 
+        alt="Loading..."
         fill
         className="object-cover"
         unoptimized
         priority
+        onLoadingComplete={handleImageLoaded}
       />
     </div>
   )
