@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowUpRight, FileText, Camera, Palette, BookOpen } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { fetchWithRetry } from "@/lib/network-utils"
 import { ExploreContentModal } from "./explore-content-modal"
 
 // Fallback explore content for when Supabase is not available
@@ -98,34 +98,17 @@ export function ExploreSection() {
   const [selectedContentSlug, setSelectedContentSlug] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Fetch explore content from Supabase
+  // Fetch explore content via Next.js API (avoids browser QUIC/HTTP3 issues)
   useEffect(() => {
     async function fetchExploreContent() {
       try {
         setLoading(true)
-        console.log('🔍 Fetching explore content...')
-        const { data, error } = await supabase
-          .from('explore_content')
-          .select('id, title, slug, content_type, excerpt, content, featured_image_url, is_published, created_at')
-          .eq('is_published', true)
-          .order('created_at', { ascending: false })
+        console.log('🔍 Fetching explore content via /api/public/explore ...')
+        const response = await fetchWithRetry('/api/public/explore?limit=20', { cache: 'no-store' }, { maxRetries: 2, baseDelay: 700, maxDelay: 2000 })
+        const json = await response.json()
 
-        console.log('🔍 Supabase response:', { data, error, hasData: !!data, dataLength: data?.length })
-
-        if (error) {
-          console.error('❌ Error fetching explore content:')
-          console.error('Full error object:', error)
-          console.error('Error message:', error.message)
-          console.error('Error code:', error.code)
-          console.error('Error details:', error.details)
-          console.error('Error hint:', error.hint)
-          console.error('Error stringified:', JSON.stringify(error, null, 2))
-          // Keep fallback data on error
-          return
-        }
-
-        if (data && data.length > 0) {
-          console.log('✅ Successfully fetched', data.length, 'explore content items')
+        if (json?.data && Array.isArray(json.data) && json.data.length > 0) {
+          console.log('✅ Successfully fetched', json.data.length, 'explore content items')
           // Group content by type and transform for component
           const groupedContent: typeof fallbackExploreContent = {
             "Visual Articles": [],
@@ -135,7 +118,7 @@ export function ExploreSection() {
           }
 
           // Transform Supabase data
-          data.forEach((item) => {
+          json.data.forEach((item: any) => {
             const transformedItem = {
               id: item.id,
               title: item.title,
@@ -159,12 +142,10 @@ export function ExploreSection() {
 
           setExploreContent(groupedContent)
         } else {
-          console.log('⚠️ No explore content found or empty data array')
+          console.log('⚠️ No explore content found or empty data array from API')
         }
       } catch (error) {
-        console.error('💥 Exception in fetchExploreContent:', error)
-        console.error('Exception type:', typeof error)
-        console.error('Exception stringified:', JSON.stringify(error, null, 2))
+        console.warn('⏱️ Explore API issue, using fallback. Reason:', (error as any)?.message || error)
         // Keep fallback data on error
       } finally {
         setLoading(false)
@@ -188,8 +169,10 @@ export function ExploreSection() {
     <section id="explore" className="py-16 bg-black text-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="mb-12">
-          <h2 className="text-5xl lg:text-6xl font-light text-white mb-6">
-            ONA <span className="text-[#ff6b00]">Explore</span>
+          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group">
+            <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">ONA</span>
+            {" "}
+            <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Explore</span>
           </h2>
           <p className="text-xl text-zinc-300 font-light max-w-3xl">
             Dive deeper into our creative process, research, and artistic explorations. Discover the stories,
@@ -207,8 +190,8 @@ export function ExploreSection() {
                 onClick={() => setActiveTab(tab.name)}
                 className={`flex items-center space-x-2 px-6 py-4 text-sm font-light tracking-wider uppercase transition-all duration-300 border-b-2 ${
                   activeTab === tab.name
-                    ? "border-[#ff6b00] text-[#ff6b00]"
-                    : "border-transparent text-zinc-400 hover:text-[#ff6b00]"
+                    ? "border-white text-white"
+                    : "border-transparent text-zinc-400 hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -226,7 +209,7 @@ export function ExploreSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden hover:border-[#ff6b00]/60 transition-all duration-500 hover:bg-white/15"
+              className="group cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden hover:border-white/60 transition-all duration-500 hover:bg-white/15"
               onMouseEnter={() => setHoveredItem(item.id)}
               onMouseLeave={() => setHoveredItem(null)}
               onClick={() => item.slug && handleContentClick(item.slug)}
@@ -247,11 +230,11 @@ export function ExploreSection() {
                     }`}
                   />
                   <div
-                    className={`absolute top-6 right-6 p-3 bg-[#ff6b00]/30 backdrop-blur-sm rounded-full border border-[#ff6b00]/30 transition-all duration-500 ${
+                    className={`absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 transition-all duration-500 ${
                       hoveredItem === item.id ? "opacity-100 translate-x-0 scale-110" : "opacity-0 translate-x-4"
                     }`}
                   >
-                    <ArrowUpRight className="h-5 w-5 text-[#ff6b00]" />
+                    <ArrowUpRight className="h-5 w-5 text-white" />
                   </div>
                   
                   {/* Content Type Badge */}
@@ -274,12 +257,12 @@ export function ExploreSection() {
                         })}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-zinc-400 rounded-full"></div>
                         <span className="text-xs text-zinc-500 uppercase tracking-wide">Featured</span>
                       </div>
                     </div>
                     
-                    <h3 className="text-2xl lg:text-3xl font-light text-white group-hover:text-zinc-200 transition-colors duration-300 leading-tight">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white transition-all duration-300 leading-tight group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">
                       {item.title}
                     </h3>
                     
@@ -289,7 +272,7 @@ export function ExploreSection() {
                     
                     <div className="pt-6">
                       <motion.div 
-                        className="inline-flex items-center text-sm font-medium text-blue-400 group-hover:text-blue-300 transition-colors"
+                        className="inline-flex items-center text-sm font-medium text-zinc-300 group-hover:text-white transition-colors"
                         whileHover={{ x: 5 }}
                         transition={{ duration: 0.2 }}
                       >
@@ -303,9 +286,9 @@ export function ExploreSection() {
               
               {/* Hover Effect Border */}
               <motion.div
-                className="absolute inset-0 border-2 border-blue-400/0 rounded-2xl transition-all duration-300 pointer-events-none"
+                className="absolute inset-0 border-2 border-white/0 rounded-2xl transition-all duration-300 pointer-events-none"
                 animate={{
-                  borderColor: hoveredItem === item.id ? "rgb(96 165 250 / 0.3)" : "rgb(96 165 250 / 0)"
+                  borderColor: hoveredItem === item.id ? "rgb(255 255 255 / 0.3)" : "rgb(255 255 255 / 0)"
                 }}
               />
             </motion.div>

@@ -93,12 +93,11 @@ export async function PUT(
     console.log('📥 Received update data keys:', Object.keys(body))
     console.log('📥 Received update data:', JSON.stringify(body, null, 2))
     
-    // Test Supabase connection first
+    // Test Supabase connection first (use a valid lightweight head/count query)
     try {
-      const { data: testQuery, error: testError } = await supabaseAdmin
+      const { error: testError } = await supabaseAdmin
         .from('projects')
-        .select('count(*)')
-        .limit(1)
+        .select('*', { count: 'exact', head: true })
       
       if (testError) {
         console.error('❌ Supabase connection test failed:', testError)

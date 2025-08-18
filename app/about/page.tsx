@@ -43,17 +43,16 @@ export default function AboutPage() {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        ease: "easeOut"
+        duration: 0.6
       }
     }
   }
 
   const stats = [
-    { number: "50+", label: "Projects Completed" },
-    { number: "15+", label: "Years Experience" },
-    { number: "25+", label: "Team Members" },
-    { number: "12+", label: "Awards Won" }
+    { number: "100+", label: "Projects Completed" },
+    { number: "5+", label: "Years Experience" },
+    { number: "5+", label: "Team Members" },
+    { number: "2+", label: "Awards Won" }
   ]
 
   const values = [

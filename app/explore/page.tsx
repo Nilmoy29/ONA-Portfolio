@@ -6,7 +6,7 @@ import { Navigation } from "@/components/navigation"
 import { ArrowRight, ArrowUpRight, Calendar, User, Tag, AlertCircle, Loader2, Plus } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
+import { fetchWithRetry } from "@/lib/network-utils"
 
 export default function ExplorePage() {
   const [content, setContent] = useState([])
@@ -31,39 +31,20 @@ export default function ExplorePage() {
       let contentData: any[] = []
       let response: Response | null = null
       try {
-        response = await fetch(url)
+        response = await fetchWithRetry(url, { cache: 'no-store' })
         if (response.ok) {
           const result = await response.json()
           contentData = result.data || []
         } else {
-          // Fall back to client-side Supabase fetch if server route is misconfigured
+          // No client-side fallback to avoid QUIC issues
           if (response.status === 503 || response.status === 500) {
-            const query = supabase
-              .from('explore_content')
-              .select('id, title, slug, content_type, excerpt, description, featured_image_url, author, created_at')
-              .eq('is_published', true)
-            const { data, error } = selectedType === 'all'
-              ? await query
-              : await query.eq('content_type', selectedType)
-            if (error) throw error
-            contentData = data || []
+            // Keep empty and show error below
           } else {
             throw new Error(`HTTP error! status: ${response.status}`)
           }
         }
       } catch (err) {
-        // Network or other error: try client-side fallback once
-        if (!response) {
-          const query = supabase
-            .from('explore_content')
-            .select('id, title, slug, content_type, excerpt, description, featured_image_url, author, created_at')
-            .eq('is_published', true)
-          const { data, error } = selectedType === 'all' ? await query : await query.eq('content_type', selectedType)
-          if (error) throw error
-          contentData = data || []
-        } else {
-          throw err
-        }
+        throw err
       }
 
       setContent(contentData)
@@ -154,9 +135,10 @@ export default function ExplorePage() {
           >
             <motion.h1 
               variants={itemVariants}
-              className="text-6xl lg:text-7xl font-light mb-8"
+              className="text-6xl lg:text-7xl font-bold mb-8 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group"
             >
-              Explore & <span className="italic font-extralight text-[#ff6b00]">Discover</span>
+              <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Explore</span>{" "}
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">& Discover</span>
             </motion.h1>
             <motion.p 
               variants={itemVariants}
@@ -186,8 +168,8 @@ export default function ExplorePage() {
                 onClick={() => setSelectedType(type.value)}
                 className={`px-6 py-3 font-light uppercase tracking-wider transition-all duration-300 border ${
                   selectedType === type.value
-                    ? 'bg-[#ff6b00] text-black border-[#ff6b00]'
-                    : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:border-[#ff6b00] hover:text-[#ff6b00]'
+                    ? 'bg-white/10 text-white border-white'
+                    : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:text-white hover:border-white'
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -208,7 +190,7 @@ export default function ExplorePage() {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20"
             >
-              <Loader2 className="h-12 w-12 text-[#ff6b00] animate-spin mb-4" />
+              <Loader2 className="h-12 w-12 text-white animate-spin mb-4" />
               <p className="text-xl text-zinc-300 font-light">Loading content...</p>
             </motion.div>
           ) : error ? (
@@ -234,7 +216,7 @@ export default function ExplorePage() {
                     setSelectedType('all')
                     fetchContent()
                   }}
-                  className="mt-6 px-6 py-3 bg-[#ff6b00] text-black font-light uppercase tracking-wider hover:bg-[#ff6b00]/90 transition-colors"
+                  className="mt-6 px-6 py-3 border border-white text-white font-light uppercase tracking-wider hover:bg-white hover:text-black transition-colors"
                 >
                   Try All Content
                 </button>
@@ -260,7 +242,7 @@ export default function ExplorePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.05 }}
-                    className="group cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden hover:border-[#ff6b00]/60 transition-all duration-500 hover:bg-white/15 shadow-[0_1px_0_0_rgba(255,255,255,0.06)]"
+                    className="group cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden hover:border-white/60 transition-all duration-500 hover:bg-white/15 shadow-[0_1px_0_0_rgba(255,255,255,0.06)]"
                     onMouseEnter={() => setHoveredItem(item.id || index)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
@@ -279,11 +261,11 @@ export default function ExplorePage() {
                           }`}
                         />
                         <div
-                          className={`absolute top-6 right-6 p-3 bg-[#ff6b00]/30 backdrop-blur-sm rounded-full border border-[#ff6b00]/30 transition-all duration-500 ${
+                          className={`absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 transition-all duration-500 ${
                             hoveredItem === (item.id || index) ? "opacity-100 translate-x-0 scale-110" : "opacity-0 translate-x-4"
                           }`}
                         >
-                          <ArrowUpRight className="h-5 w-5 text-[#ff6b00]" />
+                          <ArrowUpRight className="h-5 w-5 text-white" />
                         </div>
                         <div className="absolute bottom-4 left-4">
                           <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium text-black rounded-full capitalize">
@@ -299,12 +281,12 @@ export default function ExplorePage() {
                               {formatDate(item.created_at)}
                             </span>
                             <div className="flex items-center space-x-2">
-                              <div className="w-2 h-2 bg-[#ff6b00] rounded-full"></div>
+                              <div className="w-2 h-2 bg-zinc-400 rounded-full"></div>
                               <span className="text-xs text-zinc-500 uppercase tracking-wide">Featured</span>
                             </div>
                           </div>
 
-                          <h3 className="text-2xl lg:text-3xl font-light text-white group-hover:text-zinc-200 transition-colors duration-300 leading-tight">
+                          <h3 className="text-2xl lg:text-3xl font-bold text-white transition-all duration-300 leading-tight group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">
                             {item.title || 'Untitled Content'}
                           </h3>
 
@@ -314,7 +296,7 @@ export default function ExplorePage() {
 
                           <div className="pt-6">
                             <motion.div 
-                              className="inline-flex items-center text-sm font-medium text-[#ff6b00] group-hover:text-white transition-colors"
+                              className="inline-flex items-center text-sm font-medium text-zinc-300 group-hover:text-white transition-colors"
                               whileHover={{ x: 5 }}
                               transition={{ duration: 0.2 }}
                             >
@@ -345,9 +327,10 @@ export default function ExplorePage() {
           >
             <motion.h2 
               variants={itemVariants}
-              className="text-5xl lg:text-6xl font-light mb-8"
+              className="text-5xl lg:text-6xl font-bold mb-8 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group"
             >
-              Stay <span className="italic font-extralight text-[#ff6b00]">Inspired</span>
+              <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Stay</span>{" "}
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Inspired</span>
             </motion.h2>
             <motion.p 
               variants={itemVariants}
@@ -388,10 +371,10 @@ export default function ExplorePage() {
                   type="email"
                   name="email"
                   placeholder="Your email address"
-                  className="flex-1 bg-transparent border-b border-zinc-600 pb-4 text-lg font-light placeholder-zinc-500 focus:outline-none focus:border-[#ff6b00] transition-colors text-white"
+                  className="flex-1 bg-transparent border-b border-zinc-600 pb-4 text-lg font-light placeholder-zinc-500 focus:outline-none focus:border-white transition-colors text-white"
                   required
                 />
-                <button type="submit" className="ml-4 text-lg font-light uppercase tracking-wider border-b border-[#ff6b00] pb-4 text-[#ff6b00] hover:text-white hover:border-white transition-colors">
+                <button type="submit" className="ml-4 text-lg font-light uppercase tracking-wider border-b border-white pb-4 text-white hover:opacity-80 transition-colors">
                   Subscribe
                 </button>
               </form>
@@ -423,9 +406,9 @@ export default function ExplorePage() {
             <div>
               <h4 className="text-lg font-light mb-4">Follow Us</h4>
               <div className="flex space-x-4">
-                <a href="#" className="text-zinc-400 hover:text-[#ff6b00] transition-colors">LinkedIn</a>
-                <a href="#" className="text-zinc-400 hover:text-[#ff6b00] transition-colors">Instagram</a>
-                <a href="#" className="text-zinc-400 hover:text-[#ff6b00] transition-colors">Twitter</a>
+                <a href="#" className="text-zinc-400 hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" className="text-zinc-400 hover:text-white transition-colors">Instagram</a>
+                <a href="#" className="text-zinc-400 hover:text-white transition-colors">Twitter</a>
               </div>
             </div>
           </div>

@@ -109,12 +109,12 @@ export function ServicesSection() {
                                  {/* Content Side */}
                 <div className={`lg:col-span-5 ${!isEven ? 'order-2 lg:order-2' : ''}`}>
                   <div className="sticky top-8">
-                    <h3 className="text-sm uppercase tracking-widest text-[#ff6b00] font-medium mb-4 flex items-center gap-2">
-                      <span className="w-8 h-px bg-[#ff6b00]"></span>
+                    <h3 className="text-sm uppercase tracking-widest text-gray-400 font-medium mb-4 flex items-center gap-2">
+                      <span className="w-8 h-px bg-gray-500"></span>
                       Service {String(index + 1).padStart(2, '0')}
                     </h3>
                     
-                    <h4 className="text-4xl lg:text-5xl font-semibold mb-6 text-white group-hover:text-[#ff6b00] transition-colors duration-500 leading-tight">
+                    <h4 className="text-4xl lg:text-5xl font-bold mb-6 text-white transition-all duration-500 leading-tight group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">
                       {service.title}
                     </h4>
                     
@@ -127,7 +127,7 @@ export function ServicesSection() {
                         const FeatureIcon = feature.icon
                         return (
                           <div key={featureIndex} className="flex items-start gap-3">
-                            <FeatureIcon className="w-5 h-5 stroke-[1.5] text-[#ff6b00] mt-0.5" />
+                            <FeatureIcon className="w-5 h-5 stroke-[1.5] text-gray-400 mt-0.5" />
                             <div>
                               <h5 className="font-medium mb-1 text-white">{feature.title}</h5>
                               <p className="text-sm text-gray-500">{feature.description}</p>

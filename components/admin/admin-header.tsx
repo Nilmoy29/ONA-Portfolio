@@ -39,11 +39,11 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-zinc-200 px-6 py-4">
+    <header className="sticky top-0 z-40 bg-white border-b border-zinc-300 px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-light text-zinc-900">Admin Panel</h1>
-          <p className="text-sm text-zinc-600">
+          <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Admin Panel</h1>
+          <p className="text-sm text-zinc-700">
             Manage ONA portfolio website content
           </p>
         </div>
@@ -51,23 +51,23 @@ export function AdminHeader() {
         <div className="flex items-center space-x-4">
           {loading ? (
             <div className="flex items-center space-x-2">
-              <RefreshCw className="h-4 w-4 animate-spin" />
-              <span className="text-sm text-zinc-500">Loading...</span>
+              <RefreshCw className="h-4 w-4 animate-spin text-zinc-700" />
+              <span className="text-sm text-zinc-700">Loading...</span>
             </div>
           ) : (
             <>
           <div className="text-right">
-                <p className="text-sm font-medium text-zinc-900">
+                <p className="text-sm font-semibold text-zinc-900">
                   {user?.email || 'Unknown User'}
                 </p>
-                <p className="text-xs text-zinc-500 capitalize">
+                <p className="text-xs text-zinc-600 capitalize">
                   {adminProfile?.role || 'No Role'}
                 </p>
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full">
+              <Button variant="outline" size="icon" className="rounded-full border-zinc-300">
                 <User className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -83,7 +83,7 @@ export function AdminHeader() {
               <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleSignOut} 
-                    className="text-red-600"
+                    className="text-red-600 focus:text-red-700"
                     disabled={signingOut}
                   >
                 <LogOut className="mr-2 h-4 w-4" />

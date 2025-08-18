@@ -1,60 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { Database } from '@/lib/database-types'
-
-// Helper function to verify admin access
-async function verifyAdminAccess(supabase: any) {
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-  
-  if (sessionError || !session) {
-    return { authorized: false, error: 'Unauthorized', status: 401 }
-  }
-
-  const { data: adminProfile, error: profileError } = await supabase
-    .from('admin_profiles')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .eq('is_active', true)
-    .single()
-
-  if (profileError || !adminProfile) {
-    return { authorized: false, error: 'Forbidden', status: 403 }
-  }
-
-  return { authorized: true, session, adminProfile }
-}
-
-// Helper function to log activity
-async function logActivity(supabase: any, userId: string, action: string, entityId?: string, details?: any) {
-  try {
-    await supabase
-      .from('admin_activity_logs')
-      .insert({
-        user_id: userId,
-        action,
-        entity_type: 'partner',
-        entity_id: entityId,
-        details
-      })
-  } catch (error) {
-    console.error('Failed to log activity:', error)
-  }
-}
+import { supabaseAdmin as supabase } from '@/lib/supabase'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
-    
-    // Verify admin access
-    const authResult = await verifyAdminAccess(supabase)
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-    }
-    
     const { data: partner, error } = await supabase
       .from('partners')
       .select('*')
@@ -79,14 +30,6 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
-    
-    // Verify admin access
-    const authResult = await verifyAdminAccess(supabase)
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-    }
-    
     const body = await request.json()
     
     // Check if partner exists
@@ -107,7 +50,7 @@ export async function PUT(
         .select('id')
         .eq('slug', body.slug)
         .neq('id', params.id)
-        .single()
+        .maybeSingle()
 
       if (duplicatePartner) {
         return NextResponse.json({ error: 'A partner with this slug already exists' }, { status: 409 })
@@ -139,12 +82,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update partner' }, { status: 500 })
     }
 
-    // Log activity
-    await logActivity(supabase, authResult.session.user.id, 'update', params.id, {
-      name: partner.name,
-      changes: Object.keys(updateData)
-    })
-
     return NextResponse.json({ data: partner })
 
   } catch (error) {
@@ -158,14 +95,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
-    
-    // Verify admin access
-    const authResult = await verifyAdminAccess(supabase)
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
-    }
-    
     // Check if partner exists
     const { data: existingPartner, error: fetchError } = await supabase
       .from('partners')
@@ -190,11 +119,6 @@ export async function DELETE(
       console.error('Error deleting partner:', error)
       return NextResponse.json({ error: 'Failed to delete partner' }, { status: 500 })
     }
-
-    // Log activity
-    await logActivity(supabase, authResult.session.user.id, 'delete', params.id, {
-      name: existingPartner.name
-    })
 
     return NextResponse.json({ message: 'Partner deleted successfully' })
 

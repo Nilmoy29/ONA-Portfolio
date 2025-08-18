@@ -34,9 +34,9 @@ export function AdminSidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 text-white">
-      <div className="flex h-16 items-center justify-center border-b border-zinc-800">
-        <Link href="/admin" className="text-xl font-light hover:text-zinc-300 transition-colors">
+    <div className="fixed inset-y-0 left-0 z-50 w-64 bg-zinc-950 text-white">
+      <div className="flex h-16 items-center justify-center border-b border-zinc-800/80">
+        <Link href="/admin" className="text-xl font-semibold tracking-tight hover:text-zinc-200 transition-colors">
           ONA Admin
         </Link>
       </div>
@@ -53,10 +53,10 @@ export function AdminSidebar() {
               href={item.href}
               prefetch={true}
               className={cn(
-                'flex items-center px-3 py-2 text-sm rounded-lg transition-colors group',
+                'flex items-center px-3 py-2 text-sm rounded-lg transition-colors group outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff6b00] focus:ring-offset-zinc-950',
                 isActive
                   ? 'bg-zinc-800 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                  : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
               )}
             >
               <item.icon className={cn(
@@ -69,8 +69,8 @@ export function AdminSidebar() {
         })}
       </nav>
       
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-zinc-800">
-        <div className="text-xs text-zinc-500 text-center">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-zinc-800/80">
+        <div className="text-xs text-zinc-400 text-center">
           <p>Office of Native Architects</p>
           <p className="mt-1">Admin Panel v1.0</p>
         </div>

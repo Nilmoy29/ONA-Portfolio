@@ -139,12 +139,11 @@ export async function POST(request: NextRequest) {
     console.log('✅ Basic validation passed')
     console.log('🔍 Checking for duplicate slug:', data.slug)
     
-    // Test Supabase connection first
+    // Test Supabase connection first (use a valid lightweight head/count query)
     try {
-      const { data: testQuery, error: testError } = await supabaseAdmin
+      const { error: testError } = await supabaseAdmin
         .from('projects')
-        .select('count(*)')
-        .limit(1)
+        .select('*', { count: 'exact', head: true })
       
       if (testError) {
         console.error('❌ Supabase connection test failed:', testError)

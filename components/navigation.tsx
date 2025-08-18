@@ -120,12 +120,12 @@ export function Navigation() {
                   href={item.href}
                   className={`text-sm font-medium tracking-wider uppercase transition-all duration-300 relative group ${
                     shouldUseWhiteLogo 
-                      ? "text-white hover:text-[#ff6b00]" 
-                      : "text-zinc-900 hover:text-[#ff6b00]"
+                      ? "text-white hover:text-zinc-300" 
+                      : "text-zinc-900 hover:text-zinc-600"
                   }`}
                 >
                   {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#ff6b00] transition-all duration-300 group-hover:w-full"></span>
+                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 ${shouldUseWhiteLogo ? 'bg-white/70' : 'bg-zinc-900/70'} transition-all duration-300 group-hover:w-full`}></span>
                 </Link>
               ))}
               <div className={`transition-all duration-300 ${
@@ -164,7 +164,7 @@ export function Navigation() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="block text-2xl font-light text-white tracking-wider uppercase hover:text-[#ff6b00] transition-colors"
+                className="block text-2xl font-light text-white tracking-wider uppercase hover:text-zinc-300 transition-colors"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => setIsOpen(false)}
               >

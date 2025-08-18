@@ -147,6 +147,9 @@ export default function ProjectsPage() {
         case 'alphabetical':
           query = query.order('title', { ascending: true })
           break
+        case 'custom':
+          query = query.order('sort_order', { ascending: true }).order('created_at', { ascending: false })
+          break
         default:
           query = query.order('created_at', { ascending: false })
       }
@@ -289,8 +292,9 @@ export default function ProjectsPage() {
           <div className="bg-black border-b border-zinc-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <div className="text-center">
-                <h1 className="text-4xl md:text-6xl font-light text-white mb-6">
-                  Our <span className="text-[#ff6b00]">Projects</span>
+                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group">
+                  <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Our</span>{" "}
+                  <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Projects</span>
                 </h1>
                 <p className="text-xl text-zinc-300 max-w-3xl mx-auto">
                   Explore our portfolio of architectural projects that blend indigenous wisdom 
@@ -310,11 +314,11 @@ export default function ProjectsPage() {
                   placeholder="Search projects..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-zinc-900 border-zinc-700 text-white placeholder-zinc-400 focus:border-[#ff6b00] focus:ring-[#ff6b00]/20"
+                  className="pl-10 bg-zinc-900 border-zinc-700 text-white placeholder-zinc-400 focus:border-white focus:ring-white/20"
                 />
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full sm:w-48 bg-zinc-900 border-zinc-700 text-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20">
+                <SelectTrigger className="w-full sm:w-48 bg-zinc-900 border-zinc-700 text-white focus:border-white focus:ring-white/20">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -329,7 +333,7 @@ export default function ProjectsPage() {
               </Select>
             </div>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full lg:w-48 bg-zinc-900 border-zinc-700 text-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20">
+              <SelectTrigger className="w-full lg:w-48 bg-zinc-900 border-zinc-700 text-white focus:border-white focus:ring-white/20">
                 <SelectValue placeholder="Sort by..." />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-700">
@@ -345,7 +349,7 @@ export default function ProjectsPage() {
           <div className="mb-6">
             {loading ? (
               <div className="text-zinc-300 flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#ff6b00] mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 {retrying ? 'Retrying...' : 'Loading projects...'}
               </div>
             ) : (
@@ -359,7 +363,7 @@ export default function ProjectsPage() {
                   ⚠️ Database is experiencing high load. Showing sample data. 
                   <button 
                     onClick={() => fetchProjects()}
-                    className="ml-2 text-[#ff6b00] hover:underline"
+                    className="ml-2 text-white hover:opacity-80"
                   >
                     Try again
                   </button>
@@ -386,7 +390,7 @@ export default function ProjectsPage() {
                 <Button 
                   variant="outline" 
                   onClick={() => fetchProjects()}
-                  className="border-zinc-700 text-zinc-300 hover:border-[#ff6b00] hover:text-[#ff6b00] hover:bg-[#ff6b00]/10"
+                  className="border-zinc-700 text-zinc-300 hover:border-white hover:text-white hover:bg-white/10"
                 >
                   Try Again
                 </Button>
@@ -397,7 +401,7 @@ export default function ProjectsPage() {
                     setSelectedCategory('all')
                     setError(null)
                   }}
-                  className="border-zinc-700 text-zinc-300 hover:border-[#ff6b00] hover:text-[#ff6b00] hover:bg-[#ff6b00]/10"
+                  className="border-zinc-700 text-zinc-300 hover:border-white hover:text-white hover:bg-white/10"
                 >
                   Clear Filters
                 </Button>
@@ -408,7 +412,7 @@ export default function ProjectsPage() {
               <p className="text-zinc-400 text-lg">No projects found matching your criteria.</p>
               <Button 
                 variant="outline" 
-                className="mt-4 border-zinc-700 text-zinc-300 hover:border-[#ff6b00] hover:text-[#ff6b00] hover:bg-[#ff6b00]/10"
+                className="mt-4 border-zinc-700 text-zinc-300 hover:border-white hover:text-white hover:bg:white/10"
                 onClick={() => {
                   setSearchTerm('')
                   setSelectedCategory('all')
@@ -421,7 +425,7 @@ export default function ProjectsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project) => (
                 <Link key={project.id} href={`/projects/${project.slug}`} className="block group">
-                  <Card className="group hover:shadow-2xl transition-all duration-300 overflow-hidden bg-zinc-900 border-zinc-800 hover:border-[#ff6b00]/30 rounded-xl cursor-pointer">
+                  <Card className="group hover:shadow-2xl transition-all duration-300 overflow-hidden bg-zinc-900 border-zinc-800 hover:border-white/30 rounded-xl cursor-pointer">
                     <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
                       {project.featured_image_url ? (
                         <Image
@@ -454,7 +458,7 @@ export default function ProjectsPage() {
  
                     </div>
                     <CardContent className="p-6">
-                      <h3 className="text-xl font-medium text-white mb-2 group-hover:text-[#ff6b00] transition-colors">
+                      <h3 className="text-xl font-bold text-white mb-2 transition-all group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">
                         {project.title}
                       </h3>
                       {project.description && (
@@ -484,7 +488,7 @@ export default function ProjectsPage() {
           {/* Load More - Future Enhancement */}
           {projects.length > 0 && projects.length % 9 === 0 && (
             <div className="text-center mt-12">
-              <Button variant="outline" size="lg" className="border-[#ff6b00] text-[#ff6b00] hover:bg-[#ff6b00] hover:text-black">
+              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
                 Load More Projects
               </Button>
             </div>

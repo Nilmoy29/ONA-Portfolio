@@ -74,8 +74,9 @@ export default function TeamPage() {
       <section className="pt-32 pb-16 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-5xl lg:text-6xl font-light text-white mb-6">
-              Our <span className="text-[#ff6b00]">Team</span>
+            <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group">
+              <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Our</span>{" "}
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Team</span>
             </h1>
             <p className="text-xl text-zinc-300 font-light max-w-3xl mx-auto">
               Meet the talented professionals behind our innovative designs. Our multidisciplinary team brings together
@@ -105,7 +106,7 @@ export default function TeamPage() {
                   onClick={() => member.slug && handleMemberClick(member.slug)}
                 >
                   {/* Transparent Glass Card Container */}
-                  <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 hover:border-[#ff6b00]/60 transition-all duration-500 overflow-hidden group-hover:-translate-y-2 hover:bg-white/15">
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 hover:border-white/60 transition-all duration-500 overflow-hidden group-hover:-translate-y-2 hover:bg-white/15">
                     {/* Image Container */}
                     <div className="relative overflow-hidden">
                       <div className="aspect-square bg-gradient-to-br from-white/5 to-white/10">
@@ -122,10 +123,10 @@ export default function TeamPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       
                       {/* Floating icon */}
-                      <div className={`absolute top-4 right-4 w-10 h-10 bg-[#ff6b00]/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-500 border border-[#ff6b00]/30 ${
+                      <div className={`absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-500 border border-white/30 ${
                         hoveredMember === member.id ? "opacity-100 scale-100" : "opacity-0 scale-75"
                       }`}>
-                        <ArrowUpRight className="h-5 w-5 text-[#ff6b00]" />
+                        <ArrowUpRight className="h-5 w-5 text-white" />
                       </div>
                     </div>
 
@@ -135,7 +136,7 @@ export default function TeamPage() {
                         <h3 className="text-lg font-medium text-white group-hover:text-zinc-200 transition-colors leading-tight">
                           {member.name}
                         </h3>
-                        <p className="text-[#ff6b00] font-light text-xs uppercase tracking-wider">{member.role}</p>
+                        <p className="text-zinc-400 font-light text-xs uppercase tracking-wider">{member.role}</p>
                       </div>
                       
                       {/* Minimalist action indicator */}
@@ -165,8 +166,9 @@ export default function TeamPage() {
       <section className="py-32 bg-zinc-900 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-5xl lg:text-6xl font-light mb-6">
-              Our <span className="text-[#ff6b00]">Culture</span>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-6 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group">
+              <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Our</span>{" "}
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Culture</span>
             </h2>
             <p className="text-xl text-zinc-400 font-light max-w-3xl mx-auto">
               We believe in creating an environment where creativity flourishes, 

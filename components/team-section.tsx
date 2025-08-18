@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { fetchWithRetry } from "@/lib/network-utils"
 import { TeamMemberModal } from "./team-member-modal"
 
 // Fallback team data for when Supabase is not available
@@ -77,36 +77,19 @@ export function TeamSection() {
   const [selectedMemberSlug, setSelectedMemberSlug] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Fetch team members from Supabase
+  // Fetch team members via Next.js API
   useEffect(() => {
     async function fetchTeamMembers() {
       try {
         setLoading(true)
-        console.log('🔍 Fetching team members...')
-        const { data, error } = await supabase
-          .from('team_members')
-          .select('id, name, slug, position, bio, profile_image_url, specializations, education, is_published, sort_order')
-          .eq('is_published', true)
-          .order('sort_order', { ascending: true })
+        console.log('🔍 Fetching team members via /api/public/team ...')
+        const response = await fetchWithRetry('/api/public/team?limit=24', { cache: 'no-store' })
+        const json = await response.json()
 
-        console.log('🔍 Supabase response:', { data, error, hasData: !!data, dataLength: data?.length })
-
-        if (error) {
-          console.error('❌ Error fetching team members:')
-          console.error('Full error object:', error)
-          console.error('Error message:', error.message)
-          console.error('Error code:', error.code)
-          console.error('Error details:', error.details)
-          console.error('Error hint:', error.hint)
-          console.error('Error stringified:', JSON.stringify(error, null, 2))
-          // Keep fallback data on error
-          return
-        }
-
-        if (data && data.length > 0) {
-          console.log('✅ Successfully fetched', data.length, 'team members')
+        if (json?.data && Array.isArray(json.data) && json.data.length > 0) {
+          console.log('✅ Successfully fetched', json.data.length, 'team members')
           // Transform Supabase data to match component expectations
-          const transformedTeam = data.map((member) => ({
+          const transformedTeam = json.data.map((member: any) => ({
             id: member.id,
             name: member.name,
             slug: member.slug,
@@ -118,7 +101,7 @@ export function TeamSection() {
           }))
           setTeam(transformedTeam)
         } else {
-          console.log('⚠️ No team members found or empty data array')
+          console.log('⚠️ No team members found or empty data array from API')
         }
       } catch (error) {
         console.error('💥 Exception in fetchTeamMembers:', error)

@@ -26,14 +26,17 @@ export const supabase = globalForSupabase.__supabase
 // Admin client for server-side operations (only used in API routes)
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zY2ljZHlqcG5ueWt5cXB2dXlzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjM2MTc5NywiZXhwIjoyMDY3OTM3Nzk3fQ.RFGdVve9Gq9I19YKsDSBmKIFSEJDi0141l5JkbkFQgI'
 
-// Note: This stays module-scoped for server-only usage. Do NOT import in client components.
-export const supabaseAdmin = createClient(
-  supabaseUrl,
-  supabaseServiceKey,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
+// Create admin client only on the server to avoid multiple GoTrueClient instances in the browser
+export const supabaseAdmin: SupabaseClient = (typeof window === 'undefined')
+  ? createClient(
+      supabaseUrl,
+      supabaseServiceKey,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+  // Type cast for client-side where this should never be used
+  : (undefined as unknown as SupabaseClient)

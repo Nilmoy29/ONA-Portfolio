@@ -137,16 +137,14 @@ export function ContactSection() {
         >
           <motion.div variants={itemVariants}>
             <motion.h2 
-              className="text-5xl lg:text-6xl font-light mb-12"
+              className="text-5xl lg:text-6xl font-bold mb-12 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group"
               variants={itemVariants}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              Let's Create
+              <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Let's</span>{" "}
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Create</span>
               <br />
-              <span className="italic font-extralight relative">
-                Together
-                <span className="absolute -bottom-2 left-0 w-24 h-0.5 bg-[#ff6b00]"></span>
-              </span>
+              <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Together</span>
             </motion.h2>
 
             <motion.div 
@@ -159,7 +157,7 @@ export function ContactSection() {
                 whileHover={{ x: 10 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <Mail className="h-6 w-6 text-[#ff6b00] mt-1" />
+                <Mail className="h-6 w-6 text-zinc-400 mt-1" />
                 <div>
                   <p className="text-zinc-400 text-sm font-light uppercase tracking-wider mb-1">Email</p>
                   <p className="text-xl font-light">info@ona.com.bd</p>
@@ -171,7 +169,7 @@ export function ContactSection() {
                 whileHover={{ x: 10 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <Phone className="h-6 w-6 text-[#ff6b00] mt-1" />
+                <Phone className="h-6 w-6 text-zinc-400 mt-1" />
                 <div>
                   <p className="text-zinc-400 text-sm font-light uppercase tracking-wider mb-1">Phone</p>
                   <p className="text-xl font-light">01721115555</p>
@@ -183,7 +181,7 @@ export function ContactSection() {
                 whileHover={{ x: 10 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <MapPin className="h-6 w-6 text-[#ff6b00] mt-1" />
+                <MapPin className="h-6 w-6 text-zinc-400 mt-1" />
                 <div>
                   <p className="text-zinc-400 text-sm font-light uppercase tracking-wider mb-1">Studio</p>
                   <p className="text-xl font-light">
@@ -207,7 +205,7 @@ export function ContactSection() {
                   href="https://www.linkedin.com/company/ona-office-of-native-architects/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  className="text-zinc-400 hover:text-white transition-colors font-light"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -215,7 +213,7 @@ export function ContactSection() {
                 </motion.a>
                 <motion.a
                   href="#"
-                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  className="text-zinc-400 hover:text-white transition-colors font-light"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -225,7 +223,7 @@ export function ContactSection() {
                   href="https://www.facebook.com/people/ONA-I-Office-of-Native-Architects/61574622031136/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-zinc-400 hover:text-[#ff6b00] transition-colors font-light"
+                  className="text-zinc-400 hover:text-white transition-colors font-light"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -250,7 +248,7 @@ export function ContactSection() {
                   placeholder="First Name"
                   value={formData.firstName}
                   onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                  className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
                   required
                   whileFocus={{ scale: 1.02 }}
                 />
@@ -259,7 +257,7 @@ export function ContactSection() {
                   placeholder="Last Name"
                   value={formData.lastName}
                   onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                  className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                  className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
                   required
                   whileFocus={{ scale: 1.02 }}
                 />
@@ -290,7 +288,7 @@ export function ContactSection() {
                 placeholder="Tell us about your project"
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
-                className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-[#ff6b00] transition-colors resize-none"
+                className="w-full bg-transparent border-b border-zinc-700 pb-4 text-xl font-light placeholder-zinc-500 focus:outline-none focus:border-white transition-colors resize-none"
                 required
                 variants={itemVariants}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -319,7 +317,7 @@ export function ContactSection() {
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center space-x-3 text-xl font-light uppercase tracking-wider border border-[#ff6b00] text-[#ff6b00] px-8 py-4 hover:bg-[#ff6b00] hover:text-black transition-all duration-300 group disabled:opacity-50"
+                className="flex items-center space-x-3 text-xl font-light uppercase tracking-wider border border-white text-white px-8 py-4 hover:bg-white hover:text-black transition-all duration-300 group disabled:opacity-50"
                 variants={itemVariants}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 whileHover={{ scale: 1.05 }}
@@ -366,14 +364,14 @@ export function ContactSection() {
                   placeholder="Your email address"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="flex-1 bg-transparent border-b border-zinc-700 pb-4 text-lg font-light placeholder-zinc-500 focus:outline-none focus:border-[#ff6b00] transition-colors"
+                  className="flex-1 bg-transparent border-b border-zinc-700 pb-4 text-lg font-light placeholder-zinc-500 focus:outline-none focus:border-white transition-colors"
                   required
                   whileFocus={{ scale: 1.02 }}
                 />
                 <motion.button 
                   type="submit"
                   disabled={isNewsletterSubmitting}
-                  className="ml-4 text-lg font-light uppercase tracking-wider border-b border-[#ff6b00] text-[#ff6b00] pb-4 hover:text-white hover:border-white transition-colors disabled:opacity-50"
+                  className="ml-4 text-lg font-light uppercase tracking-wider border-b border-white text-white pb-4 hover:opacity-80 transition-colors disabled:opacity-50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

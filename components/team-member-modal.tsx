@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Mail, Phone, Award, Calendar, ExternalLink, MapPin } from "lucide-react"
 import Image from "next/image"
-import { supabase } from "@/lib/supabase"
+import { fetchWithRetry } from "@/lib/network-utils"
 
 interface TeamMemberModalProps {
   isOpen: boolean
@@ -48,19 +48,13 @@ export function TeamMemberModal({ isOpen, onClose, slug }: TeamMemberModalProps)
     
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('team_members')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .single()
-
-      if (error) {
-        console.error('Error fetching team member:', error)
+      const response = await fetchWithRetry(`/api/public/team/${slug}`, { cache: 'no-store' })
+      if (!response.ok) {
+        console.error('Error fetching team member: HTTP', response.status)
         return
       }
-
-      setMember(data)
+      const json = await response.json()
+      setMember(json?.data || null)
     } catch (error) {
       console.error('Error fetching team member:', error)
     } finally {

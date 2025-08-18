@@ -1,31 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/lib/database-types'
+import { supabaseAdmin as supabase } from '@/lib/supabase'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-// Check if environment variables are available, fallback gracefully
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing Supabase environment variables')
-}
-
-const supabase = supabaseUrl && supabaseServiceKey 
-  ? createClient<Database>(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
-  : null
+// Using server-only admin client; env is validated in its module
 
 export async function GET(request: NextRequest) {
   try {
-    if (!supabase) {
-      return NextResponse.json({ 
-        error: 'Service temporarily unavailable - missing configuration' 
-      }, { status: 503 })
-    }
+    // supabase client is available via server-only import
 
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -50,7 +30,7 @@ export async function GET(request: NextRequest) {
         created_at
       `, { count: 'exact' })
       .eq('is_published', true)
-      .limit(limit) // Use the limit parameter
+      
     
     // Apply search filter (simplified)
     if (search) {
@@ -77,6 +57,12 @@ export async function GET(request: NextRequest) {
         break
       case 'alphabetical':
         query = query.order('title', { ascending: true })
+        break
+      case 'custom':
+        // Sort by explicit sort_order first, then fallback to newest
+        query = query
+          .order('sort_order', { ascending: true, nullsFirst: false as any })
+          .order('created_at', { ascending: false })
         break
       default:
         query = query.order('created_at', { ascending: false })

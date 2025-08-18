@@ -5,8 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight, Calendar, MapPin, Square } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { supabaseQueryWithRetry, logNetworkStatus } from "@/lib/network-utils"
+import { fetchWithRetry, logNetworkStatus } from "@/lib/network-utils"
 
 // Fallback projects data for when Supabase is not available
 const fallbackProjects = [
@@ -111,50 +110,24 @@ export function ProjectsSection() {
         // Log network status for debugging
         logNetworkStatus()
         
-        // Fetch categories first with retry
-        const categoriesResult = await supabaseQueryWithRetry(async () =>
-          await supabase
-            .from('categories')
-            .select('id, name, slug, sort_order')
-            .order('sort_order', { ascending: true })
-        )
-
-        if (categoriesResult.error) {
-          console.error('❌ Error fetching categories:', categoriesResult.error)
-        } else if (categoriesResult.data && Array.isArray(categoriesResult.data) && categoriesResult.data.length > 0) {
-          const categoryNames = ["All projects", ...categoriesResult.data.map((cat: any) => cat.name)]
-          setCategories(categoryNames)
-          console.log('✅ Successfully loaded', categoriesResult.data.length, 'categories')
+        // Fetch categories via API (best-effort, quick retry)
+        try {
+          await fetchWithRetry('/api/public/projects?limit=1', { cache: 'no-store' }, { maxRetries: 1, baseDelay: 500, maxDelay: 1500 })
+        } catch {
+          console.warn('⚠️ Categories API not available; using default categories')
         }
 
-        // Fetch projects with retry
-        const projectsResult = await supabaseQueryWithRetry(async () =>
-          await supabase
-            .from('projects')
-            .select(`
-              id, title, slug, description, featured_image_url, location, client_name, 
-              project_status, project_type, created_at, sort_order, is_published,
-              categories (
-                id, name, slug, color
-              )
-            `)
-            .eq('is_published', true)
-            .order('sort_order', { ascending: true })
-        )
+        // Fetch projects via API (use custom order set in admin) with reduced retry
+        const projectsResponse = await fetchWithRetry('/api/public/projects?limit=20&sort=custom', { cache: 'no-store' }, { maxRetries: 2, baseDelay: 700, maxDelay: 2000 })
+        const projectsJson = await projectsResponse.json()
 
-        if (projectsResult.error) {
-          console.error('❌ Error fetching projects:', projectsResult.error)
-          console.log('🔄 Using fallback projects due to database error')
-          return
-        }
-
-        if (projectsResult.data && Array.isArray(projectsResult.data) && projectsResult.data.length > 0) {
-          const transformedProjects = projectsResult.data.map((project: any) => ({
+        if (projectsJson?.data && Array.isArray(projectsJson.data) && projectsJson.data.length > 0) {
+          const transformedProjects = projectsJson.data.map((project: any) => ({
             id: project.id,
             title: project.title,
             slug: project.slug,
-            category: project.categories?.name || "General",
-            categorySlug: project.categories?.slug || "general",
+            category: project.category || "General",
+            categorySlug: project.category?.toLowerCase?.() || "general",
             type: project.project_type || project.project_status || "Commercial",
             year: project.created_at ? new Date(project.created_at).getFullYear().toString() : "2024",
             location: project.location || "",
@@ -165,7 +138,7 @@ export function ProjectsSection() {
             description: project.description || "",
             concept: project.description || "",
             tags: [],
-            categoryColor: project.categories?.color || null,
+            categoryColor: project.categoryColor || null,
           }))
           setProjects(transformedProjects)
           console.log('✅ Successfully loaded', transformedProjects.length, 'projects from Supabase')
@@ -173,7 +146,7 @@ export function ProjectsSection() {
           console.log('⚠️ No projects found in database, using fallback data')
         }
       } catch (error: any) {
-        console.error('❌ Final error after retries:', error.message || error)
+        console.warn('⏱️ Network/API issue, using fallback projects. Reason:', error?.message || error)
         console.log('🔄 Using fallback projects due to persistent errors')
       } finally {
         setLoading(false)
@@ -209,7 +182,11 @@ export function ProjectsSection() {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-5xl lg:text-6xl font-light mb-6">Project Showcase</h2>
+              <h2 className="text-5xl lg:text-6xl font-bold mb-6 transition-all duration-500 hover:text-transparent hover:[-webkit-text-stroke:1px_white] group">
+                <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Project</span>
+                {" "}
+                <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">Showcase</span>
+              </h2>
               <p className="text-xl text-zinc-300 font-light max-w-2xl mb-12">
                 Each project represents our commitment to creating spaces that honor cultural heritage while addressing
                 contemporary needs.
@@ -223,8 +200,8 @@ export function ProjectsSection() {
                     onClick={() => setActiveFilter(category)}
                     className={`px-6 py-3 text-sm font-light tracking-wider uppercase transition-all duration-300 border relative group ${
                       activeFilter === category
-                        ? "border-[#ff6b00] text-[#ff6b00] bg-[#ff6b00]/10"
-                        : "border-zinc-700 text-zinc-400 hover:border-[#ff6b00] hover:text-[#ff6b00]"
+                        ? "border-white text-white bg-white/10"
+                        : "border-zinc-700 text-zinc-400 hover:border-white hover:text-white"
                     }`}
                   >
                     {category}
@@ -290,7 +267,7 @@ export function ProjectsSection() {
                               {project.area}
                             </span>
                           </div>
-                          <h3 className="text-4xl lg:text-5xl font-light leading-tight mb-2">{project.title}</h3>
+                          <h3 className="text-4xl lg:text-5xl font-bold leading-tight mb-2 transition-all duration-500 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">{project.title}</h3>
                           <p className="text-lg text-zinc-300 font-light">{project.description}</p>
                         </motion.div>
 
@@ -304,8 +281,8 @@ export function ProjectsSection() {
                           }}
                           transition={{ duration: 0.3 }}
                         >
-                          <div className="w-12 h-12 bg-[#ff6b00]/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-[#ff6b00]/30">
-                            <ArrowRight className="w-6 h-6 text-[#ff6b00]" />
+                          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                            <ArrowRight className="w-6 h-6 text-white" />
                           </div>
                         </motion.div>
                       </motion.div>
@@ -326,7 +303,7 @@ export function ProjectsSection() {
               >
                 <Link
                   href="/projects"
-                  className="group relative inline-flex items-center gap-4 px-8 py-4 text-lg font-light tracking-wider uppercase border border-[#ff6b00] text-[#ff6b00] transition-all duration-300 hover:bg-[#ff6b00] hover:text-black"
+                  className="group relative inline-flex items-center gap-4 px-8 py-4 text-lg font-light tracking-wider uppercase border border-white text-white transition-all duration-300 hover:bg-white hover:text-black"
                 >
                   View All Projects
                   <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />

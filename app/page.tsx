@@ -74,13 +74,16 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div>
-                <div className="flex items-center mb-4">
+                <div className="flex items-center mb-4 group">
                   <img 
                     src="/ona-logo-white.png" 
                     alt="Office of Native Architects" 
                     className="h-8 mr-3"
                   />
-                  <span className="text-white font-bold text-lg">| Office of Native Architects</span>
+                  <span className="font-bold text-lg transition-all duration-300 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">
+                    <span className="text-white group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">ONA</span>{" "}
+                    <span className="text-zinc-400 group-hover:text-transparent group-hover:[-webkit-text-stroke:1px_white]">| Office of Native Architects</span>
+                  </span>
                 </div>
                 <p className="text-zinc-400 font-light text-sm leading-relaxed">
                   Creating architectural narratives that honor indigenous wisdom while embracing contemporary

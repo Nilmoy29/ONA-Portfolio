@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/lib/database-types'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-// Initialize client defensively so the route doesn't crash if env is missing
-const supabase = supabaseUrl && supabaseServiceKey
-  ? createClient<Database>(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-  : null
+import { supabaseAdmin as supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable - missing configuration' },
-        { status: 503 }
-      )
-    }
+    // supabase client is available via server-only import
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -54,9 +38,15 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query
     
     if (error) {
-      console.error('Error fetching explore content:', error)
+      console.error('Error fetching explore content:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json({ 
-        error: 'Failed to fetch explore content' 
+        error: 'Failed to fetch explore content',
+        code: error.code
       }, { status: 500 })
     }
     

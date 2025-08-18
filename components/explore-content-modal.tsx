@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Calendar, User, Tag, ExternalLink, Play, FileText, Eye } from "lucide-react"
 import Image from "next/image"
-import { supabase } from "@/lib/supabase"
+import { fetchWithRetry } from "@/lib/network-utils"
 
 interface ExploreContentModalProps {
   isOpen: boolean
@@ -47,19 +47,13 @@ export function ExploreContentModal({ isOpen, onClose, slug }: ExploreContentMod
     
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('explore_content')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .single()
-
-      if (error) {
-        console.error('Error fetching explore content:', error)
+      const response = await fetchWithRetry(`/api/public/explore/${slug}`, { cache: 'no-store' })
+      if (!response.ok) {
+        console.error('Error fetching explore content: HTTP', response.status)
         return
       }
-
-      setContent(data)
+      const json = await response.json()
+      setContent(json?.data || null)
     } catch (error) {
       console.error('Error fetching explore content:', error)
     } finally {
@@ -198,14 +192,14 @@ export function ExploreContentModal({ isOpen, onClose, slug }: ExploreContentMod
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.3 }}
-                      className="relative aspect-[16/9] bg-gray-800 rounded-2xl overflow-hidden border border-gray-700"
+                      className="relative h-[70vh] bg-black rounded-2xl border border-gray-700 flex items-center justify-center"
                     >
                       <Image
                         src={content.featured_image_url}
                         alt={content.title}
                         width={800}
                         height={450}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </motion.div>
                   )}
@@ -216,7 +210,7 @@ export function ExploreContentModal({ isOpen, onClose, slug }: ExploreContentMod
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.3 }}
-                      className="relative aspect-[16/9] bg-gray-800 rounded-2xl overflow-hidden border border-gray-700"
+                      className="relative h-[70vh] bg-black rounded-2xl border border-gray-700 flex items-center justify-center"
                     >
                       <div className="absolute inset-0 flex items-center justify-center">
                         <motion.button
@@ -233,7 +227,7 @@ export function ExploreContentModal({ isOpen, onClose, slug }: ExploreContentMod
                         alt={content.title}
                         width={800}
                         height={450}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </motion.div>
                   )}
@@ -313,14 +307,14 @@ export function ExploreContentModal({ isOpen, onClose, slug }: ExploreContentMod
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.8 + index * 0.1 }}
-                            className="aspect-[4/3] bg-gray-800 rounded-xl overflow-hidden border border-gray-700"
+                            className="h-64 bg-black rounded-xl border border-gray-700 flex items-center justify-center"
                           >
                             <Image
                               src={image}
                               alt={`${content.title} gallery ${index + 1}`}
                               width={400}
                               height={300}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                             />
                           </motion.div>
                         ))}
