@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 
 function detectIsMobile(): boolean {
@@ -18,10 +18,20 @@ function detectIsMobile(): boolean {
 
 export function HeroSection() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null)
+  const [gifLoaded, setGifLoaded] = useState(false)
+  const imageRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     setIsMobile(detectIsMobile())
   }, [])
+
+  const handleImageLoad = () => {
+    setGifLoaded(true)
+    // Ensure the GIF keeps playing by setting a flag
+    if (imageRef.current) {
+      imageRef.current.style.animationPlayState = 'running'
+    }
+  }
 
   if (isMobile === null) {
     return <div className="relative w-full h-screen bg-black" />
@@ -33,12 +43,20 @@ export function HeroSection() {
     <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
       <div className="absolute inset-0 pt-12 md:pt-16">
         <Image
+          ref={imageRef}
           src={gifSrc}
           alt="Hero animation"
           fill
           priority
           unoptimized
           className="object-cover"
+          onLoad={handleImageLoad}
+          style={{
+            // Use CSS to ensure GIF animation continues
+            animationPlayState: 'running',
+            // Alternative: use transform to prevent re-render issues
+            transform: 'translateZ(0)'
+          }}
         />
       </div>
     </section>

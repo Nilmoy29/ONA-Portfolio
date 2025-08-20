@@ -16,12 +16,14 @@ export async function GET(_request: NextRequest) {
         hint: error.hint,
         code: error.code
       })
-      return NextResponse.json({ error: 'Failed to fetch partners', code: error.code }, { status: 500 })
+      // Degrade gracefully so the client can use fallbacks without 500 noise
+      return NextResponse.json({ data: [] })
     }
 
     return NextResponse.json({ data: data || [] })
   } catch (error: any) {
     console.error('Error in partners GET:', error)
-    return NextResponse.json({ error: 'Failed to fetch partners' }, { status: 500 })
+    // Degrade gracefully on unexpected errors
+    return NextResponse.json({ data: [] })
   }
 }

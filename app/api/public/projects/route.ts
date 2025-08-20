@@ -5,17 +5,14 @@ import { supabaseAdmin as supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    // supabase client is available via server-only import
-
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20') // Reduced limit
+    const limit = parseInt(searchParams.get('limit') || '20')
     const category = searchParams.get('category') || ''
     const search = searchParams.get('search') || ''
     const sort = searchParams.get('sort') || 'newest'
     const featured = searchParams.get('featured') === 'true'
     
-    // Ultra-simplified query to prevent timeouts
     let query = supabase
       .from('projects')
       .select(`
@@ -31,58 +28,25 @@ export async function GET(request: NextRequest) {
       `, { count: 'exact' })
       .eq('is_published', true)
       
-    
-    // Apply search filter (simplified)
-    if (search) {
-      query = query.ilike('title', `%${search}%`)
-    }
-    
-    // Apply category filter
-    if (category && category !== 'all') {
-      query = query.eq('category_id', category)
-    }
-    
-    // Apply featured filter
-    if (featured) {
-      query = query.eq('is_featured', true)
-    }
+    if (search) query = query.ilike('title', `%${search}%`)
+    if (category && category !== 'all') query = query.eq('category_id', category)
+    if (featured) query = query.eq('is_featured', true)
 
-    // Apply sorting (simplified)
     switch (sort) {
-      case 'newest':
-        query = query.order('created_at', { ascending: false })
-        break
-      case 'oldest':
-        query = query.order('created_at', { ascending: true })
-        break
-      case 'alphabetical':
-        query = query.order('title', { ascending: true })
-        break
+      case 'oldest': query = query.order('created_at', { ascending: true }); break
+      case 'alphabetical': query = query.order('title', { ascending: true }); break
       case 'custom':
-        // Sort by explicit sort_order first, then fallback to newest
-        query = query
-          .order('sort_order', { ascending: true, nullsFirst: false as any })
-          .order('created_at', { ascending: false })
+        query = query.order('sort_order', { ascending: true, nullsFirst: false as any })
+                     .order('created_at', { ascending: false })
         break
-      default:
-        query = query.order('created_at', { ascending: false })
+      default: query = query.order('created_at', { ascending: false })
     }
     
     const from = (page - 1) * limit
     const to = from + limit - 1
     query = query.range(from, to)
     
-    // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Query timeout')), 8000) // 8 second timeout
-    })
-    
-    const queryPromise = query
-    
-    const { data, error, count } = await Promise.race([
-      queryPromise,
-      timeoutPromise
-    ]) as any
+    const { data, error, count } = await query
     
     if (error) {
       console.error('Error fetching projects:', {
@@ -91,19 +55,11 @@ export async function GET(request: NextRequest) {
         hint: error.hint,
         code: error.code
       })
-      
-      // Handle timeout specifically
-      if (error.code === '57014' || error.message?.includes('timeout')) {
-        return NextResponse.json({ 
-          error: 'Database query timed out - please try again',
-          code: error.code
-        }, { status: 408 })
-      }
-      
-      return NextResponse.json({ 
-        error: `Database error: ${error.message}`,
-        code: error.code
-      }, { status: 500 })
+      // Graceful degrade
+      return NextResponse.json({
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 }
+      })
     }
     
     return NextResponse.json({
@@ -121,16 +77,13 @@ export async function GET(request: NextRequest) {
       stack: error?.stack,
       error: error
     })
-    
-    // Handle timeout errors
-    if (error?.message?.includes('timeout')) {
-      return NextResponse.json({ 
-        error: 'Request timeout - please try again' 
-      }, { status: 408 })
-    }
-    
+    // Graceful degrade on unexpected errors
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '20')
     return NextResponse.json({ 
-      error: `Server error: ${error?.message || 'Unknown error'}` 
-    }, { status: 500 })
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 }
+    })
   }
 }

@@ -23,7 +23,6 @@ import {
   Building,
   Award,
   Sparkles,
-  ArrowRight,
   Clock,
   Globe,
   Eye,
@@ -476,47 +475,7 @@ export default function ProjectDetailPage() {
                 </div>
               </motion.section>
 
-              {/* Project Gallery */}
-              {allImages.length > 1 && (
-                <motion.section
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                >
-                  <h2 className="text-4xl font-light text-white mb-8">Project Gallery</h2>
-                  <div className="grid grid-cols-1 gap-6">
-                    {allImages.slice(1).map((imageUrl, index) => (
-                      <motion.div 
-                        key={index}
-                        className="relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.3 }}
-                        onClick={() => {
-                          setCurrentImageIndex(index + 1)
-                          setIsGalleryOpen(true)
-                        }}
-                      >
-                        <Image
-                          src={imageUrl}
-                          alt={`${project.title} - Image ${index + 2}`}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            whileHover={{ scale: 1, opacity: 1 }}
-                            className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
-                          >
-                            <ExternalLink className="w-6 h-6 text-white" />
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.section>
-              )}
+              
 
               {/* Project Features */}
               {project.features && project.features.length > 0 && (
@@ -768,44 +727,51 @@ export default function ProjectDetailPage() {
                 </Card>
               </motion.div>
 
-              {/* Contact CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
-                  <CardContent className="p-8 text-center">
-                    <h3 className="text-2xl font-medium text-white mb-4">
-                      Interested in Similar Work?
-                    </h3>
-                    <p className="text-zinc-400 mb-8 leading-relaxed">
-                      Let's discuss how we can bring your vision to life with sustainable, 
-                      culturally responsive design that honors both tradition and innovation.
-                    </p>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button asChild size="lg" className="w-full bg-white text-black hover:bg-zinc-200 font-medium">
-                        <Link href="/contact">
-                          Start Your Project
-                          <motion.div
-                            className="ml-2"
-                            animate={{ x: [0, 5, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                          >
-                            <ArrowRight className="w-5 h-5" />
-                          </motion.div>
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+              
             </div>
           </div>
+          {/* Project Gallery - moved below details and made larger */}
+          {allImages.length > 1 && (
+            <motion.section
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mt-12"
+            >
+              <h2 className="text-4xl font-light text-white mb-8">Project Gallery</h2>
+              <div className="space-y-8">
+                {allImages.slice(1).map((imageUrl, index) => (
+                  <motion.div
+                    key={index}
+                    className="relative w-full h-[70vh] rounded-2xl overflow-hidden cursor-pointer group"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={() => {
+                      setCurrentImageIndex(index + 1)
+                      setIsGalleryOpen(true)
+                    }}
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt={`${project.title} - Image ${index + 2}`}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileHover={{ scale: 1, opacity: 1 }}
+                        className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+                      >
+                        <ExternalLink className="w-6 h-6 text-white" />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
         </div>
       </div>
 

@@ -3,7 +3,6 @@ import { supabaseAdmin as supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    // supabase client is available via server-only import
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -44,10 +43,11 @@ export async function GET(request: NextRequest) {
         hint: error.hint,
         code: error.code
       })
-      return NextResponse.json({ 
-        error: 'Failed to fetch explore content',
-        code: error.code
-      }, { status: 500 })
+      // Graceful degrade
+      return NextResponse.json({
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 }
+      })
     }
     
     return NextResponse.json({
@@ -61,8 +61,13 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error in explore GET:', error)
+    // Graceful degrade on unexpected errors
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
     return NextResponse.json({ 
-      error: 'Failed to fetch explore content' 
-    }, { status: 500 })
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 }
+    })
   }
 }
