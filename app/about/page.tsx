@@ -118,7 +118,7 @@ export default function AboutPage() {
             >
               <div className="aspect-square bg-zinc-100 rounded-lg overflow-hidden">
                 <Image
-                  src="/api/placeholder/600/600"
+                  src="ona-logo-main.jpg"
                   alt="ONA Studio"
                   width={600}
                   height={600}
@@ -131,7 +131,7 @@ export default function AboutPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8 }}
               >
-                <p className="text-2xl font-light">Est. 2009</p>
+                <p className="text-2xl font-light">Est. 2022</p>
                 <p className="text-sm text-zinc-400 font-light">Dhaka, Bangladesh</p>
               </motion.div>
             </motion.div>
@@ -254,76 +254,6 @@ export default function AboutPage() {
                 <span>View All Team Members</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Contact Information */}
-      <section className="py-32 bg-zinc-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={containerVariants}
-            className="grid lg:grid-cols-2 gap-16"
-          >
-            <motion.div variants={itemVariants}>
-              <h2 className="text-5xl lg:text-6xl font-light mb-8">
-                Get In <span className="italic font-extralight">Touch</span>
-              </h2>
-              <p className="text-xl text-zinc-600 font-light leading-relaxed mb-8">
-                Ready to start your next project? We'd love to hear from you and discuss 
-                how we can bring your vision to life.
-              </p>
-              
-              <div className="space-y-6">
-                <motion.div 
-                  className="flex items-center space-x-4"
-                  whileHover={{ x: 10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <MapPin className="h-6 w-6 text-zinc-400" />
-                  <div>
-                    <p className="text-zinc-600 font-light">123 Architecture Ave, Dhaka</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  className="flex items-center space-x-4"
-                  whileHover={{ x: 10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Phone className="h-6 w-6 text-zinc-400" />
-                  <div>
-                    <p className="text-zinc-600 font-light">01721115555</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  className="flex items-center space-x-4"
-                  whileHover={{ x: 10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Mail className="h-6 w-6 text-zinc-400" />
-                  <div>
-                    <p className="text-zinc-600 font-light">officeofnativearchitects@gmail.com</p>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <div className="aspect-square bg-zinc-200 rounded-lg overflow-hidden">
-                <Image
-                  src="/api/placeholder/600/600"
-                  alt="ONA Office"
-                  width={600}
-                  height={600}
-                  className="w-full h-full object-cover"
-                />
-              </div>
             </motion.div>
           </motion.div>
         </div>

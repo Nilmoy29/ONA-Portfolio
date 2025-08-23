@@ -33,27 +33,6 @@ export function ThreeDotMenu({ isDark = false }: ThreeDotMenuProps) {
           >
             About Us
           </Link>
-          <Link
-            href="/careers"
-            className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
-            onClick={() => setIsOpen(false)}
-          >
-            Careers
-          </Link>
-          <Link
-            href="/news"
-            className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
-            onClick={() => setIsOpen(false)}
-          >
-            News & Updates
-          </Link>
-          <Link
-            href="/sustainability"
-            className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
-            onClick={() => setIsOpen(false)}
-          >
-            Sustainability
-          </Link>
         </div>
       )}
     </div>

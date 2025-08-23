@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const query = searchParams.get('q') || ''
-    const type = searchParams.get('type') || 'all' // all, projects, team, services, explore, partners, careers
+    const type = searchParams.get('type') || 'all' // all, projects, team, services, explore, partners
     const limit = parseInt(searchParams.get('limit') || '20')
     const page = parseInt(searchParams.get('page') || '1')
 
@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
           services: [],
           explore: [],
           partners: [],
-          careers: [],
           total: 0
         },
         pagination: {
@@ -43,8 +42,7 @@ export async function GET(request: NextRequest) {
       team: [],
       services: [],
       explore: [],
-      partners: [],
-      careers: []
+      partners: []
     }
 
     // Calculate offset for pagination
@@ -138,27 +136,9 @@ export async function GET(request: NextRequest) {
       }))
     }
 
-    // Search job openings
-    if (type === 'all' || type === 'careers') {
-      const { data: careers } = await supabase
-        .from('job_openings')
-        .select('id, title, slug, department, location, employment_type, description')
-        .eq('is_published', true)
-        .or(`title.ilike.%${searchQuery}%,department.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
-        .order('is_featured', { ascending: false })
-        .order('created_at', { ascending: false })
-        .range(type === 'careers' ? offset : 0, type === 'careers' ? offset + limit - 1 : 4)
-
-      results.careers = (careers || []).map(job => ({
-        ...job,
-        type: 'career',
-        url: `/careers/${job.slug}`
-      }))
-    }
-
     // Calculate totals
     const total = results.projects.length + results.team.length + results.services.length + 
-                  results.explore.length + results.partners.length + results.careers.length
+                  results.explore.length + results.partners.length
     
     // For single type searches, return just that type's results
     if (type !== 'all') {
@@ -180,8 +160,7 @@ export async function GET(request: NextRequest) {
       ...results.team,
       ...results.services,
       ...results.explore,
-      ...results.partners,
-      ...results.careers
+      ...results.partners
     ]
 
     return NextResponse.json({

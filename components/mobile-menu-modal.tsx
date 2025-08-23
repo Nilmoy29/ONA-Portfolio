@@ -53,15 +53,12 @@ export function MobileMenuModal({ isOpen, onClose }: MobileMenuModalProps) {
       title: "About Us", 
       items: [
         { label: "Our Team", href: "/team", description: "Meet the architects and designers" },
-        { label: "About ONA", href: "/about", description: "Our story and philosophy" },
-        { label: "Sustainability", href: "/sustainability", description: "Our environmental commitment" }
+        { label: "About ONA", href: "/about", description: "Our story and philosophy" }
       ]
     },
     {
       title: "Resources",
       items: [
-        { label: "News & Updates", href: "/news", description: "Latest insights and announcements" },
-        { label: "Careers", href: "/careers", description: "Join our team" },
         { label: "Contact", href: "/contact", description: "Get in touch with us" }
       ]
     }
