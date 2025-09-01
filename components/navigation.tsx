@@ -60,17 +60,12 @@ export function Navigation() {
     { name: "Contact", href: "/#contact" },
   ]
 
-  // Define which sections have dark backgrounds (use white logo)
-  const darkSections = ["hero", "projects", "contact"]
-  const shouldUseWhiteLogo = darkSections.includes(currentSection)
+  // For demo: Always use black background with white logo
+  const shouldUseWhiteLogo = true
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-40 transition-all duration-500 ${
-        shouldUseWhiteLogo 
-          ? "bg-black/20 backdrop-blur-md" 
-          : "bg-white/90 backdrop-blur-md shadow-sm"
-      }`}>
+      <nav className="fixed top-0 w-full z-40 transition-all duration-500 bg-black/95 backdrop-blur-md shadow-lg">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link href="/" className="relative z-50">
@@ -85,30 +80,13 @@ export function Navigation() {
                 }}
                 className="relative"
               >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={shouldUseWhiteLogo ? "white" : "black"}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{
-                      duration: 0.3,
-                      ease: "easeOut"
-                    }}
-                  >
-                    <Image
-                      src={shouldUseWhiteLogo ? "/ona-logo-white.png" : "/ona-logo-black.png"}
-                      alt="ONA"
-                      width={200}
-                      height={70}
-                      className={`w-auto transition-all duration-300 ${
-                        shouldUseWhiteLogo 
-                          ? "h-14 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
-                          : "h-10 drop-shadow-[0_2px_4px_rgba(255,255,255,0.6)]"
-                      }`}
-                    />
-                  </motion.div>
-                </AnimatePresence>
+                <Image
+                  src="/ona-logo-white-2.png"
+                  alt="ONA"
+                  width={120}
+                  height={40}
+                  className="w-auto h-8 transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                />
               </motion.div>
             </Link>
 
@@ -118,33 +96,21 @@ export function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-sm font-medium tracking-wider uppercase transition-all duration-300 relative group ${
-                    shouldUseWhiteLogo 
-                      ? "text-white hover:text-zinc-300" 
-                      : "text-zinc-900 hover:text-zinc-600"
-                  }`}
+                  className="text-sm font-medium tracking-wider uppercase transition-all duration-300 relative group text-white hover:text-zinc-300"
                 >
                   {item.name}
-                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 ${shouldUseWhiteLogo ? 'bg-white/70' : 'bg-zinc-900/70'} transition-all duration-300 group-hover:w-full`}></span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white/70 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
               ))}
-              <div className={`transition-all duration-300 ${
-                shouldUseWhiteLogo 
-                  ? "text-white" 
-                  : "text-zinc-900"
-              }`}>
-                <ThreeDotMenu isDark={shouldUseWhiteLogo} />
+              <div className="transition-all duration-300 text-white">
+                <ThreeDotMenu isDark={true} />
               </div>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`lg:hidden z-50 transition-all duration-300 ${
-                shouldUseWhiteLogo 
-                  ? "text-white hover:text-zinc-200" 
-                  : "text-zinc-900 hover:text-zinc-600"
-              }`}
+              className="lg:hidden z-50 transition-all duration-300 text-white hover:text-zinc-200"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
