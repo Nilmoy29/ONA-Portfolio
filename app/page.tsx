@@ -60,7 +60,7 @@ export default function HomePage() {
     <>
       {shouldShowLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
 
-      <div className={`transition-opacity duration-1000 ${shouldShowLoading ? "opacity-0" : "opacity-100"}`}>
+      <div className={`min-w-0 overflow-x-hidden transition-opacity duration-1000 ${shouldShowLoading ? "opacity-0" : "opacity-100"}`}>
         <Navigation />
         <HeroSection />
         <ServicesSection />

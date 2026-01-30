@@ -65,8 +65,9 @@ export function Navigation() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40 transition-all duration-500 bg-black/95 backdrop-blur-md shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* Solid bg-black on mobile: Android often fails on backdrop-filter, causing white bleed. left-0 right-0 for reliable full-width on fixed. */}
+      <nav className="fixed top-0 left-0 right-0 w-full z-40 transition-all duration-500 bg-black lg:bg-black/95 lg:backdrop-blur-md shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[var(--safe-top)]">
           <div className="flex justify-between items-center h-20">
             <Link href="/" className="relative z-50">
               <motion.div
@@ -81,11 +82,11 @@ export function Navigation() {
                 className="relative"
               >
                 <Image
-                  src="/ona-logo-white-2.png"
+                  src="/ona-logo-white.png"
                   alt="ONA"
-                  width={120}
-                  height={40}
-                  className="w-auto h-8 transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                  width={160}
+                  height={48}
+                  className="max-h-10 w-auto h-auto object-contain transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                 />
               </motion.div>
             </Link>

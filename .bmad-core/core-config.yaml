@@ -1,0 +1,44 @@
+# BMAD™ Core Configuration - Updated for Organized Documentation Structure
+markdownExploder: true
+
+# Quality Assurance Configuration
+qa:
+  qaLocation: docs/development/qa
+
+# Product Requirements Document Configuration
+prd:
+  prdFile: docs/bmad/templates/prd-template.md
+  prdVersion: v4
+  prdSharded: true
+  prdShardedLocation: docs/bmad/templates/prd
+  epicFilePattern: epic-{n}*.md
+
+# Architecture Documentation Configuration
+architecture:
+  architectureFile: docs/architecture/overview.md
+  architectureVersion: v4
+  architectureSharded: true
+  architectureShardedLocation: docs/architecture
+
+# Custom Technical Documents (extendable)
+customTechnicalDocuments: null
+
+# Development Files to Always Load
+devLoadAlwaysFiles:
+  - docs/architecture/overview.md
+  - docs/development/coding-standards.md
+  - docs/development/tech-stack.md
+  - docs/development/source-tree.md
+  - docs/bmad/overview.md
+
+# Development Configuration
+devDebugLog: .ai/debug-log.md
+devStoryLocation: docs/bmad/templates/stories
+
+# BMAD System Configuration
+slashPrefix: BMad
+bmadEnabled: true
+agentsPath: .bmad-core/agents
+templatesPath: .bmad-core/templates
+checklistsPath: .bmad-core/checklists
+workflowsPath: .bmad-core/workflows

@@ -108,7 +108,7 @@ export function ServicesSection() {
               >
                                  {/* Content Side */}
                 <div className={`lg:col-span-5 ${!isEven ? 'order-2 lg:order-2' : ''}`}>
-                  <div className="sticky top-8">
+                  <div className="lg:sticky lg:top-8">
                     <h3 className="text-sm uppercase tracking-widest text-gray-400 font-medium mb-4 flex items-center gap-2">
                       <span className="w-8 h-px bg-gray-500"></span>
                       Service {String(index + 1).padStart(2, '0')}
