@@ -50,7 +50,7 @@ const servicesData = [
     features: [
       { icon: Mountain, title: "Structural Solution", description: "Robust and context-sensitive structural designs." },
       { icon: Settings, title: "Electrical Solution", description: "Seamless integration of modern electrical systems" },
-      { icon: Brush, title: "Flexibility Calculation", description: "Accurate modeling to ensure structural performance." }
+      { icon: Brush, title: "Feasibility Calculation", description: "Accurate modeling to ensure structural performance." }
     ],
     images: [
       "/Heritage.jpg",

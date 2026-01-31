@@ -36,7 +36,6 @@ import {
   Heart,
   Star
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 
 interface ProjectDetail {
   id: string
@@ -101,89 +100,43 @@ export default function ProjectDetailPage() {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
 
   useEffect(() => {
-    if (params.slug) {
-      fetchProject(params.slug as string)
+    const slug = params.slug
+    const slugStr = typeof slug === 'string' ? slug : Array.isArray(slug) ? slug[0] : null
+    if (slugStr) {
+      fetchProject(slugStr)
     }
   }, [params.slug])
 
   const fetchProject = async (slug: string) => {
-    console.log('🔍 Fetching project with slug:', slug)
-    console.log('🔍 Slug type:', typeof slug)
-    console.log('🔍 Slug length:', slug.length)
-    
     try {
-      // First check if any projects exist with this slug
-      const { data: projects, error: queryError } = await supabase
-        .from('projects')
-        .select(`
-          *,
-          categories (
-            id,
-            name,
-            color
-          ),
-          project_team_members (
-            team_members (
-              id,
-              name,
-              position,
-              profile_image_url,
-              slug
-            )
-          ),
-          project_partners (
-            partners (
-              id,
-              name,
-              logo_url,
-              slug
-            )
-          )
-        `)
-        .eq('slug', slug)
-        .eq('is_published', true)
+      const response = await fetch(`/api/public/projects/${encodeURIComponent(slug)}`)
+      const json = await response.json()
 
-      console.log('🔍 Query completed. Error:', queryError)
-      console.log('🔍 Projects found:', projects?.length || 0)
-      
-      if (queryError) {
-        console.error('Database query error:', queryError)
-        setError('Database error occurred')
+      if (!response.ok) {
+        const message = json.unpublished && json.hint
+          ? json.hint
+          : (json.error || 'Project not found')
+        setError(message)
         return
       }
 
-      if (!projects || projects.length === 0) {
-        console.error('No project found with slug:', slug)
-        console.log('🔍 Available projects check...')
-        
-        // Debug: Check what projects exist
-        const { data: allProjects } = await supabase
-          .from('projects')
-          .select('slug, title, is_published')
-          .eq('is_published', true)
-        
-        console.log('🔍 All available published projects:', allProjects?.map(p => p.slug))
+      const raw = json.data
+      if (!raw) {
         setError('Project not found')
         return
       }
 
-      if (projects.length > 1) {
-        console.error('Multiple projects found with slug:', slug, 'Projects:', projects.map(p => p.id))
-        setError('Multiple projects found with this identifier')
-        return
-      }
-
-      // Use the single project found
-      const project = projects[0]
-      console.log('✅ Project loaded successfully:', project.title)
-      
+      // Map API response (category, team, partners) to page shape (categories, team_members, partners)
       setProject({
-        ...project,
-        team_members: project.project_team_members?.map((ptm: any) => ptm.team_members) || [],
-        partners: project.project_partners?.map((pp: any) => pp.partners) || []
+        ...raw,
+        categories: raw.category
+          ? { id: raw.category.id, name: raw.category.name, color: raw.category.color }
+          : undefined,
+        team_members: raw.team?.map((t: { team_member: Record<string, unknown> }) => t.team_member) ?? [],
+        partners: raw.partners?.map((p: { partner: Record<string, unknown> }) => p.partner) ?? []
       })
-    } catch (error) {
-      console.error('Error fetching project:', error)
+    } catch (err) {
+      console.error('Error fetching project:', err)
       setError('An unexpected error occurred')
     } finally {
       setLoading(false)

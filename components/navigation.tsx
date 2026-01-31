@@ -84,9 +84,9 @@ export function Navigation() {
                 <Image
                   src="/ona-logo-white.png"
                   alt="ONA"
-                  width={160}
-                  height={48}
-                  className="max-h-10 w-auto h-auto object-contain transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                  width={250}
+                  height={74}
+                  className="max-h-[62px] w-auto h-auto object-contain transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                 />
               </motion.div>
             </Link>

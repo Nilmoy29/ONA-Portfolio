@@ -21,11 +21,7 @@ This guide covers the environment configuration required to run the ONA Portfoli
 
 Create a `.env.local` file in the project root with the following variables:
 
-```env
-# Supabase Configuration (Required)
-NEXT_PUBLIC_SUPABASE_URL=https://oscicdyjpnnykyqpvuys.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zY2ljZHlqcG5ueWt5cXB2dXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjE3OTcsImV4cCI6MjA2NzkzNzc5N30.IJrRjFZqKHejoM0GS6y0l50OXDmsoJRhVXINixJyB8E
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zY2ljZHlqcG5ueWt5cXB2dXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjE3OTcsImV4cCI6MjA2NzkzNzc5N30.RFGdVve9Gq9I19YKsDSBmKIFSEJDi0141l5JkbkFQgI
+
 
 # Application Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000

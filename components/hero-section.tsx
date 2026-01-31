@@ -18,46 +18,51 @@ function detectIsMobile(): boolean {
 
 export function HeroSection() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null)
-  const [gifLoaded, setGifLoaded] = useState(false)
-  const imageRef = useRef<HTMLImageElement>(null)
+  const [useVideoFallback, setUseVideoFallback] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     setIsMobile(detectIsMobile())
   }, [])
 
-  const handleImageLoad = () => {
-    setGifLoaded(true)
-    // Ensure the GIF keeps playing by setting a flag
-    if (imageRef.current) {
-      imageRef.current.style.animationPlayState = 'running'
-    }
-  }
-
   if (isMobile === null) {
     return <div className="relative w-full h-screen bg-black" />
   }
 
+  const videoSrc = isMobile ? "/HeroLoading2.mp4" : "/HeroLoading.mp4"
   const gifSrc = isMobile ? "/HeroLoading.gif" : "/HeroLoading2.gif"
+
+  // Prefer video (plays once with loop={false}); fallback to GIF when video is missing or fails
+  const useVideo = !useVideoFallback
 
   return (
     <section id="hero" className="relative w-full h-screen overflow-hidden bg-black">
       <div className="absolute inset-0 pt-12 md:pt-16">
-        <Image
-          ref={imageRef}
-          src={gifSrc}
-          alt="Hero animation"
-          fill
-          priority
-          unoptimized
-          className="object-cover"
-          onLoad={handleImageLoad}
-          style={{
-            // Use CSS to ensure GIF animation continues
-            animationPlayState: 'running',
-            // Alternative: use transform to prevent re-render issues
-            transform: 'translateZ(0)'
-          }}
-        />
+        {useVideo ? (
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            autoPlay
+            muted
+            playsInline
+            loop={false}
+            onEnded={() => {
+              // Video plays once; stays on last frame (default behavior)
+            }}
+            onError={() => setUseVideoFallback(true)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <Image
+            src={gifSrc}
+            alt="Hero animation"
+            fill
+            priority
+            unoptimized
+            className="object-cover"
+            style={{ transform: "translateZ(0)" }}
+          />
+        )}
       </div>
     </section>
   )
