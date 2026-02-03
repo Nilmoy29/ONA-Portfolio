@@ -9,9 +9,14 @@ const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Content ID is required' }, { status: 400 })
+    }
+
     // Use service role client for admin operations - bypasses RLS and authentication issues
     const { data: content, error } = await supabaseAdmin
       .from('explore_content')
@@ -24,7 +29,7 @@ export async function GET(
           profile_image_url
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -74,9 +79,14 @@ async function validateAuthorId(authorId: string | null | undefined) {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Content ID is required' }, { status: 400 })
+    }
+
     const body = await request.json()
     
     // Validate content_type if provided
@@ -111,7 +121,7 @@ export async function PUT(
         published_at: body.is_published ? (body.published_at || new Date().toISOString()) : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -141,14 +151,19 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Content ID is required' }, { status: 400 })
+    }
+
     // Use service role client for admin operations - bypasses RLS and authentication issues
     const { data: existingContent, error: fetchError } = await supabaseAdmin
       .from('explore_content')
       .select('id, title')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError || !existingContent) {
@@ -159,7 +174,7 @@ export async function DELETE(
     const { error } = await supabaseAdmin
       .from('explore_content')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error deleting explore content:', error)
@@ -168,7 +183,7 @@ export async function DELETE(
 
     return NextResponse.json({ 
       message: 'Content deleted successfully',
-      data: { id: params.id, title: existingContent.title }
+      data: { id, title: existingContent.title }
     })
 
   } catch (error) {

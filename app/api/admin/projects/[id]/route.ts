@@ -34,9 +34,14 @@ async function logActivity(userId: string, action: string, entityId?: string, de
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 })
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess(request.headers.get('authorization'))
     if (!authResult.authorized) {
@@ -56,7 +61,7 @@ export async function GET(
           team_members (id, name, slug, position)
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -74,10 +79,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    console.log('🔍 PUT /api/admin/projects/[id] - Starting request for ID:', params.id)
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 })
+    }
+
+    console.log('🔍 PUT /api/admin/projects/[id] - Starting request for ID:', id)
     console.log('📋 Environment check:')
     console.log('- NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing')
     console.log('- SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing')
@@ -117,11 +127,11 @@ export async function PUT(
     }
     
     // Check if project exists
-    console.log('🔍 Checking if project exists with ID:', params.id)
+    console.log('🔍 Checking if project exists with ID:', id)
     const { data: existingProject, error: fetchError } = await supabaseAdmin
       .from('projects')
       .select('id, slug, title')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError || !existingProject) {
@@ -138,7 +148,7 @@ export async function PUT(
         .from('projects')
         .select('id')
         .eq('slug', body.slug)
-        .neq('id', params.id)
+        .neq('id', id)
         .single()
 
       if (duplicateProject) {
@@ -173,7 +183,7 @@ export async function PUT(
     const { data: project, error } = await supabaseAdmin
       .from('projects')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -196,7 +206,7 @@ export async function PUT(
         const { error: deleteError } = await supabaseAdmin
           .from('project_team_members')
           .delete()
-          .eq('project_id', params.id)
+          .eq('project_id', id)
         
         if (deleteError) {
           console.error('❌ Error deleting existing team member relationships:', deleteError)
@@ -212,7 +222,7 @@ export async function PUT(
           
           if (validTeamMemberIds.length > 0) {
             const teamMemberRelations = validTeamMemberIds.map((teamMemberId: string) => ({
-              project_id: params.id,
+              project_id: id,
               team_member_id: teamMemberId.trim()
             }))
             
@@ -273,9 +283,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 })
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess(request.headers.get('authorization'))
     if (!authResult.authorized) {
@@ -286,7 +301,7 @@ export async function DELETE(
     const { data: existingProject, error: fetchError } = await supabaseAdmin
       .from('projects')
       .select('id, title')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError || !existingProject) {
@@ -297,7 +312,7 @@ export async function DELETE(
     const { error } = await supabaseAdmin
       .from('projects')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error deleting project:', error)
@@ -308,7 +323,7 @@ export async function DELETE(
     await logActivity(
       'admin-user',
       'delete',
-      params.id,
+      id,
       { title: existingProject.title }
     )
 

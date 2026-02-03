@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,12 +12,27 @@ interface ImageUploadProps {
   onChange: (url: string) => void
   label: string
   placeholder?: string
+  /** When true, uploads file to Supabase via /api/admin/media and uses the returned URL. When false, uses data URL (inline base64). */
+  uploadToStorage?: boolean
+  /** Folder name in storage (e.g. 'team', 'projects'). Used when uploadToStorage is true. */
+  storageFolder?: string
 }
 
-export function ImageUpload({ value, onChange, label, placeholder }: ImageUploadProps) {
+export function ImageUpload({
+  value,
+  onChange,
+  label,
+  placeholder,
+  uploadToStorage = false,
+  storageFolder = 'general',
+}: ImageUploadProps) {
   const [imageUrl, setImageUrl] = useState(value)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setImageUrl(value)
+  }, [value])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -39,20 +54,44 @@ export function ImageUpload({ value, onChange, label, placeholder }: ImageUpload
     setError('')
 
     try {
-      // For now, we'll create a simple placeholder URL
-      // In a real implementation, you would upload to a storage service
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string
-        setImageUrl(dataUrl)
-        onChange(dataUrl)
+      if (uploadToStorage) {
+        const formData = new FormData()
+        formData.set('file', file)
+        formData.set('folder', storageFolder)
+        formData.set('altText', label)
+
+        const response = await fetch('/api/admin/media', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const json = await response.json()
+        if (!response.ok) {
+          setError(json.error || 'Failed to upload image')
+          return
+        }
+        const url = json.data?.file_url
+        if (url) {
+          setImageUrl(url)
+          onChange(url)
+        } else {
+          setError('Upload succeeded but no URL returned')
+        }
+      } else {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const dataUrl = e.target?.result as string
+          setImageUrl(dataUrl)
+          onChange(dataUrl)
+        }
+        reader.readAsDataURL(file)
       }
-      reader.readAsDataURL(file)
-    } catch (error) {
-      console.error('Error uploading file:', error)
+    } catch (err) {
+      console.error('Error uploading file:', err)
       setError('Failed to upload image')
     } finally {
       setIsUploading(false)
+      event.target.value = ''
     }
   }
 

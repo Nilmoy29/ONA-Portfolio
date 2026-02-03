@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { Building2, Palette, Trees, Lightbulb, Hammer, BarChart3, Map, Brush, Settings, Home, Leaf, Sun, Mountain, Compass, TreePine, Waves, Wind } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 // Icon mapping for services
 const iconMap = {
@@ -38,8 +39,8 @@ const servicesData = [
       { icon: TreePine, title: "Landscape Design", description: "Sustainable and environmentally conscious design" }
     ],
     images: [
-      "/interior-design.jpg",
-      "/interior-design2.jpg"
+      { src: "/Exterior.jpg", projectHref: "/projects/jahir-residence" },
+      { src: "/Interior.jpg", projectHref: "/projects/অবসরি" }
     ]
   },
   {
@@ -53,8 +54,8 @@ const servicesData = [
       { icon: Brush, title: "Feasibility Calculation", description: "Accurate modeling to ensure structural performance." }
     ],
     images: [
-      "/Heritage.jpg",
-      "/Heritage2.jpg"
+      { src: "/Chand.jpeg", projectHref: "/projects/chand-masjid" },
+      { src: "/Heritage2.jpg", projectHref: "/projects/chitro-niloy" }
     ]
   },
   {
@@ -68,8 +69,8 @@ const servicesData = [
       { icon: Wind, title: "Climate Responsive", description: "Designs adapted to local environmental conditions" }
     ],
     images: [
-      "/Community.jpg",
-      "/Community2.jpg"
+      { src: "/Community.jpg", projectHref: "/projects/kolonto" },
+      { src: "/sohochor.jpg", projectHref: "/projects/সহচর" }
     ]
   }
 ]
@@ -145,22 +146,23 @@ export function ServicesSection() {
                 <div className={`lg:col-span-7 ${!isEven ? 'order-1 lg:order-1' : ''}`}>
                   <div className="grid sm:grid-cols-2 gap-6">
                     {service.images.map((image, imageIndex) => (
-                                             <motion.div
-                         key={imageIndex}
-                         className={`relative overflow-hidden rounded-2xl ${imageIndex === 1 ? 'sm:mt-8' : ''} bg-white p-1`}
-                         whileHover={{ scale: 1.05 }}
-                         transition={{ duration: 0.7 }}
-                       >
-                         <div className="w-full h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden">
-                           <Image
-                             src={image}
-                             alt={`${service.title} - Image ${imageIndex + 1}`}
-                             width={600}
-                             height={400}
-                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                           />
-                         </div>
-                       </motion.div>
+                      <Link key={imageIndex} href={image.projectHref}>
+                        <motion.div
+                          className={`relative overflow-hidden rounded-2xl ${imageIndex === 1 ? 'sm:mt-8' : ''} bg-white p-1 group/image`}
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.7 }}
+                        >
+                          <div className="w-full h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden">
+                            <Image
+                              src={image.src}
+                              alt={`${service.title} - Image ${imageIndex + 1}`}
+                              width={600}
+                              height={400}
+                              className="w-full h-full object-cover group-hover/image:scale-105 transition-transform duration-700"
+                            />
+                          </div>
+                        </motion.div>
+                      </Link>
                     ))}
                   </div>
                 </div>

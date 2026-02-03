@@ -33,9 +33,14 @@ async function logActivity(userId: string, action: string, entityId?: string, de
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Team member ID is required' }, { status: 400 })
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess()
     if (!authResult.authorized) {
@@ -57,7 +62,7 @@ export async function GET(
           )
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -75,9 +80,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Team member ID is required' }, { status: 400 })
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess()
     if (!authResult.authorized) {
@@ -91,7 +101,7 @@ export async function PUT(
     const { data: existingMember, error: fetchError } = await supabaseAdmin
       .from('team_members')
       .select('id, slug, name')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError || !existingMember) {
@@ -104,7 +114,7 @@ export async function PUT(
         .from('team_members')
         .select('id')
         .eq('slug', body.slug)
-        .neq('id', params.id)
+        .neq('id', id)
         .single()
 
       if (duplicateMember) {
@@ -131,7 +141,7 @@ export async function PUT(
     const { data: teamMember, error } = await supabaseAdmin
       .from('team_members')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -156,9 +166,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Team member ID is required' }, { status: 400 })
+    }
+
     // Verify admin access
     const authResult = await verifyAdminAccess()
     if (!authResult.authorized) {
@@ -169,7 +184,7 @@ export async function DELETE(
     const { data: existingMember, error: fetchError } = await supabaseAdmin
       .from('team_members')
       .select('id, name')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError || !existingMember) {
@@ -177,13 +192,13 @@ export async function DELETE(
     }
 
     // Delete related records first
-    await supabaseAdmin.from('project_team_members').delete().eq('team_member_id', params.id)
+    await supabaseAdmin.from('project_team_members').delete().eq('team_member_id', id)
 
     // Delete team member
     const { error } = await supabaseAdmin
       .from('team_members')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error deleting team member:', error)
@@ -191,7 +206,7 @@ export async function DELETE(
     }
 
     // Log activity
-    await logActivity('admin-user', 'delete', params.id, { 
+    await logActivity('admin-user', 'delete', id, { 
       name: existingMember.name
     })
 
