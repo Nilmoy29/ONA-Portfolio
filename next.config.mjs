@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -12,6 +9,8 @@ const nextConfig = {
   experimental: {
     esmExternals: true,
   },
+  // Configure Turbopack to avoid webpack config conflicts
+  turbopack: {},
   webpack: (config, { isServer }) => {
     // Fix for chunk loading errors
     if (!isServer) {
@@ -22,7 +21,7 @@ const nextConfig = {
         tls: false,
       }
     }
-    
+
     return config
   },
 }
